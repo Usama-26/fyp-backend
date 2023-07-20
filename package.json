@@ -1,0 +1,26 @@
+{
+  "name": "fyp-backend",
+  "version": "1.0.0",
+  "description": "FYP - Decentralized Freelance Marketplace - Server Side Applicatioin",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Decentralized",
+    "Freelance",
+    "Marketplace",
+    "Dapp",
+    "Backend",
+    "Server",
+    "Side"
+  ],
+  "author": "Usama Afzal",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "mongoose": "^7.4.0",
+    "nodemon": "^3.0.1"
+  }
+}
