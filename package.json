@@ -4,7 +4,7 @@
   "description": "FYP - Decentralized Freelance Marketplace - Server Side Applicatioin",
   "main": "index.js",
   "scripts": {
-    "dev": "NODE_ENV=development nodemon src/index.js"
+    "dev": " nodemon src/index.js"
   },
   "keywords": [
     "Decentralized",
