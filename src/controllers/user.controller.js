@@ -1,4 +1,4 @@
-const User = require("./../models/userModel");
+const User = require("./../models/user.model");
 
 async function getAllUsers(req, res) {
   try {
@@ -29,9 +29,23 @@ async function createUser(req, res) {
   }
 }
 
-async function deleteAll(req, res) {
+async function updateUser(req, res) {
   try {
-    await User.deleteMany();
+    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    res.status(201).json({ status: "success", data: { user } });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+}
+async function deleteUser(req, res) {
+  try {
+    await User.findByIdAndDelete(req.params.id);
     res.status(204).send();
   } catch (err) {
     res.status(400).json({
@@ -44,5 +58,6 @@ async function deleteAll(req, res) {
 module.exports = {
   getAllUsers,
   createUser,
-  deleteAll,
+  updateUser,
+  deleteUser,
 };
