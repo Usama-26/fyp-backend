@@ -8,7 +8,7 @@ const DB = { user: process.env.DB_USER, password: process.env.DB_PASSWORD };
 const port = +process.env.PORT || 8000;
 mongoose
   .connect(
-    `mongodb+srv://${DB.user}:${DB.password}@fyp-database.eatlkuz.mongodb.net/`
+    `mongodb+srv://${DB.user}:${DB.password}@fyp-database.eatlkuz.mongodb.net/fyp-database`
   )
   .then((con) =>
     console.log(

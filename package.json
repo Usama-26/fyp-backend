@@ -1,7 +1,7 @@
 {
   "name": "fyp-backend",
   "version": "1.0.0",
-  "description": "FYP - Decentralized Freelance Marketplace - Server Side Applicatioin",
+  "description": "FYP - Decentralized Freelance Marketplace - Server Side Application",
   "main": "index.js",
   "scripts": {
     "dev": " nodemon src/index.js"
