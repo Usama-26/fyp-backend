@@ -1,4 +1,4 @@
-const User = require("./../models/user.model");
+const User = require("./../models/userModel");
 
 async function getAllUsers(req, res) {
   try {
@@ -29,7 +29,20 @@ async function createUser(req, res) {
   }
 }
 
+async function deleteAll(req, res) {
+  try {
+    await User.deleteMany();
+    res.status(204).send();
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+}
+
 module.exports = {
   getAllUsers,
   createUser,
+  deleteAll,
 };
