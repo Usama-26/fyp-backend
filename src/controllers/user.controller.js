@@ -1,5 +1,6 @@
 const User = require("./../models/user.model");
 
+// Get All Users
 async function getAllUsers(req, res) {
   try {
     const users = await User.find();
@@ -17,6 +18,26 @@ async function getAllUsers(req, res) {
   }
 }
 
+// Get users by ID
+async function getUserById(req, res) {
+  try {
+    const userId = req.params.id;
+
+    const user = await User.findById(userId);
+
+    res.status(200).json({
+      status: "success",
+      data: { user } ,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+}
+
+// Create a new User
 async function createUser(req, res) {
   try {
     const newUser = await User.create(req.body);
@@ -29,6 +50,7 @@ async function createUser(req, res) {
   }
 }
 
+// Update a user
 async function updateUser(req, res) {
   try {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, {
@@ -43,6 +65,8 @@ async function updateUser(req, res) {
     });
   }
 }
+
+// Delete a user
 async function deleteUser(req, res) {
   try {
     await User.findByIdAndDelete(req.params.id);
@@ -60,4 +84,5 @@ module.exports = {
   createUser,
   updateUser,
   deleteUser,
+  getUserById,
 };
