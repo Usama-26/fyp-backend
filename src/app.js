@@ -1,6 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
 const userRouter = require("./routes/user.route");
+const gigRouter = require("./routes/gig.route");
 const app = express();
 
 app.use(express.json());
