@@ -1,65 +1,46 @@
-const Review = require('./../models/review.model'); // Import your Review model here
+const catchAsync = require('../utils/catchAsync');
+
+const Review = require('./../models/review.model');
 
 // Create a new review
-async function createReview(req, res) {
-  try {
-    const reviewData = req.body;
-    const review = await Review.create(reviewData);
+const createReview = catchAsync(async (req, res) => {
+  const reviewData = req.body;
+  const review = await Review.create(reviewData);
 
-    res.status(201).json({
-      status: 'success',
-      data: review,
-    });
-  } catch (err) {
-    res.status(400).json({
-      status: 'fail',
-      message: err.message,
-    });
-  }
-}
+  res.status(201).json({
+    status: 'success',
+    data: review,
+  });
+});
 
 // Get all reviews
-async function getAllReviews(req, res) {
-  try {
-    const reviews = await Review.find();
+const getAllReviews = catchAsync(async (req, res) => {
+  const reviews = await Review.find();
 
-    res.status(200).json({
-      status: 'success',
-      length: reviews.length,
-      data: { reviews },
-    });
-  } catch (err) {
-    res.status(400).json({
-      status: 'fail',
-      message: err.message,
-    });
-  }
-}
+  res.status(200).json({
+    status: 'success',
+    length: reviews.length,
+    data: { reviews },
+  });
+});
 
 // Get a review by its ID
-async function getReviewById(req, res) {
-  try {
-    const reviewId = req.params.id;
-    const review = await Review.findById(reviewId);
+const getReviewById = catchAsync(async (req, res) => {
+  const reviewId = req.params.id;
+  const review = await Review.findById(reviewId);
 
-    if (!review) {
-      return res.status(404).json({
-        status: 'fail',
-        message: 'Review not found',
-      });
-    }
-
-    res.status(200).json({
-      status: 'success',
-      data: review,
-    });
-  } catch (err) {
-    res.status(400).json({
+  if (!review) {
+    return res.status(404).json({
       status: 'fail',
-      message: err.message,
+      message: 'Review not found',
     });
   }
-}
+
+  res.status(200).json({
+    status: 'success',
+    data: review,
+  });
+});
 
 module.exports = {
   createReview,
