@@ -55,14 +55,10 @@ userSchema.pre("save", async function (next) {
       );
     }
 
-    try {
-      this.password = await bcrypt.hash(this.password, 12);
-      return next();
-    } catch (error) {
-      return next(error.message);
-    }
+    this.password = await bcrypt.hash(this.password, 12);
+    next();
   }
-  return next();
+  next();
 });
 
 const User = mongoose.model("User", userSchema);

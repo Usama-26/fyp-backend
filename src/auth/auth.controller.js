@@ -1,5 +1,5 @@
-const User = require('../Auth/AuthModel');
-const jwt = require('jsonwebtoken');
+const User = require("./../models/user.model");
+const jwt = require("jsonwebtoken");
 
 // User registration
 async function register(req, res) {
@@ -10,13 +10,13 @@ async function register(req, res) {
     const token = generateToken(user);
 
     res.status(201).json({
-      status: 'success',
+      status: "success",
       token,
       data: user,
     });
   } catch (err) {
     res.status(400).json({
-      status: 'fail',
+      status: "fail",
       message: err.message,
     });
   }
@@ -31,29 +31,29 @@ async function login(req, res) {
 
     if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({
-        status: 'fail',
-        message: 'Invalid email or password',
+        status: "fail",
+        message: "Invalid email or password",
       });
     }
 
     const token = generateToken(user);
 
     res.status(200).json({
-      status: 'success',
+      status: "success",
       token,
       data: user,
     });
   } catch (err) {
     res.status(400).json({
-      status: 'fail',
+      status: "fail",
       message: err.message,
     });
   }
 }
 
 function generateToken(user) {
-  return jwt.sign({ id: user._id, email: user.email }, 'your-secret-key', {
-    expiresIn: '1h', // Set your desired expiration time
+  return jwt.sign({ id: user._id, email: user.email }, "your-secret-key", {
+    expiresIn: "1h", // Set your desired expiration time
   });
 }
 
