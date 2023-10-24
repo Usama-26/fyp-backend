@@ -1,7 +1,9 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
+
 const { Schema } = mongoose;
+
 const userSchema = new Schema({
   firstName: {
     type: String,
@@ -37,8 +39,8 @@ const userSchema = new Schema({
   password: {
     type: String,
     required: [true, "A password must be set to secure user account."],
-    minLength: [8, "The password should be atleast 8 characters long"],
-    maxLength: [24, "The password should be atmost 24 characters long"],
+    minLength: [8, "The password should be at least 8 characters long"],
+    maxLength: [24, "The password should be utmost 24 characters long"],
   },
 });
 
@@ -48,7 +50,7 @@ userSchema.pre("save", async function (next) {
     if (!passwordPattern.test(this.password)) {
       return next(
         new Error(
-          "Password must contain atleast 1 character and 1 number without whitespaces."
+          "Password must contain at least 1 character and 1 number without whitespaces."
         )
       );
     }
@@ -60,7 +62,6 @@ userSchema.pre("save", async function (next) {
       return next(error.message);
     }
   }
-
   return next();
 });
 
