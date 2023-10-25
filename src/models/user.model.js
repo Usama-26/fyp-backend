@@ -42,6 +42,9 @@ const userSchema = new Schema({
     minLength: [8, "The password should be at least 8 characters long"],
     maxLength: [24, "The password should be utmost 24 characters long"],
   },
+  IsGoogle: {
+    type: Boolean,
+  }
 });
 
 userSchema.pre("save", async function (next) {

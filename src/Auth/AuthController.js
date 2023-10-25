@@ -1,60 +1,86 @@
-const User = require('../Auth/AuthModel');
-const jwt = require('jsonwebtoken');
+const User = require('../models/user.model');
+const userController = require('../controllers/user.controller');
+const bcrypt = require('bcrypt');
 
-// User registration
+
+// Register user
 async function register(req, res) {
-  const { email, password } = req.body;
+  const { firstName, lastName, username, email, password } = req.body;
 
   try {
-    const user = await User.create({ email, password });
-    const token = generateToken(user);
+    // Check if the user already exists with the provided email
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+      return res.status(409).json({
+        status: 'fail',
+        message: 'User with this email already exists',
+      });
+    }
+
+    // If the user does not exist, create a new user
+    const userData = {
+      firstName,
+      lastName,
+      username,
+      email,
+      password, // Password will be hashed in the "createUser" method
+    };
+
+    // Use the createUser method from the user controller to create the user
+    const newUser = await userController.createUser(userData);
 
     res.status(201).json({
       status: 'success',
-      token,
-      data: user,
+      message: 'User registered successfully',
+      user: newUser, // You can include user data in the response if needed
     });
   } catch (err) {
-    res.status(400).json({
-      status: 'fail',
+    res.status(500).json({
+      status: 'error',
       message: err.message,
     });
   }
 }
 
-// User login
+// Login user
 async function login(req, res) {
   const { email, password } = req.body;
 
   try {
+    // Find the user by email
     const user = await User.findOne({ email });
 
-    if (!user || !(await user.comparePassword(password))) {
+    // If the user does not exist, return an error
+    if (!user) {
       return res.status(401).json({
         status: 'fail',
-        message: 'Invalid email or password',
+        message: 'Invalid email.',
       });
     }
 
-    const token = generateToken(user);
+    // Compare the entered password with the hashed password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        status: 'fail',
+        message: 'Invalid password.',
+      });
+    }
+
+    // If email and password are valid, send a success response
     res.status(200).json({
       status: 'success',
-      token,
-      data: user,
+      message: 'Login successful',
+      user: user, // You can include user data here if needed
     });
   } catch (err) {
-    res.status(400).json({
-      status: 'fail',
+    res.status(500).json({
+      status: 'error',
       message: err.message,
     });
   }
-}
-
-function generateToken(user) {
-  return jwt.sign({ id: user._id, email: user.email }, 'your-secret-key', {
-    expiresIn: '1h', // Set your desired expiration time
-  });
 }
 
 module.exports = {
