@@ -1,25 +1,53 @@
-const mongoose = require("mongoose");
+const { default: mongoose, Schema } = require("mongoose");
+const validator = require("validator");
+const categorySchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "Name not provided."],
+      unique: [true, "Category with this name already exits."],
+      trim: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    image: {
+      type: String,
+      validate: {
+        validator: validator.isURL,
+        message: "Provided image is not a url.",
+      },
+    },
+    featured_services: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Service",
+      },
+    ],
+    popular_services: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Service",
+      },
+    ],
+    sub_categories: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "SubCategory",
+      },
+    ],
+  },
+  { timestamps: true }
+);
 
-const { Schema } = mongoose;
-
-const categorySchema = new Schema({
-  title: {
-    type: String,
-    required: [true, "Title is required"],
-  },
-  path: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  image: String,
-  slogan: String,
-  description: {
-    type: String,
-    maxLength: [5000, "Description should be maximum of 5000 characters"]
-  },
-  sub_categories: [String],
-});
+// categorySchema.virtuals({
+//   slug: {
+//     get: function () {
+//       return this.name.toLowerCase.replace(/\s+/g, "-");
+//     },
+//   },
+// });
 
 const Category = mongoose.model("Category", categorySchema);
 
