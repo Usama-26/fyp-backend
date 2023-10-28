@@ -17,7 +17,7 @@ const categorySchema = new Schema(
       type: String,
       required: true,
     },
-    image: {
+    imgUrl: {
       type: String,
       validate: {
         validator: validator.isURL,

@@ -3,13 +3,20 @@ const catchAsync = require("../utils/catchAsync"); // Replace with the actual pa
 const Category = require("./../models/category.model"); // Import your Category model here
 
 // Create a new category
-const createCategory = catchAsync(async (req, res) => {
-  const category = await Category.create(req.body);
-  res.status(201).json({
-    status: "success",
-    data: category,
-  });
-});
+const createCategory = async (req, res) => {
+  try {
+    // const category = await Category.create(req.body);
+    res.status(201).json({
+      status: "success",
+      data: req.body,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
 
 // Get all categories
 const getAllCategories = catchAsync(async (req, res) => {
