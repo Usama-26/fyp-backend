@@ -8,6 +8,7 @@ const categoryRouter = require("./routes/category.route");
 const reviewRouter = require("./routes/review.route");
 const projectRouter = require("./routes/project.route");
 const proposalRouter = require("./routes/proposal.route");
+const authRouter = require("./Auth/AuthRoute");
 
 const app = express();
 
@@ -23,7 +24,8 @@ app.use("/api/v1/users", userRouter);
 app.use("/api/v1/categories", categoryRouter);
 app.use("/api/v1/reviews", reviewRouter);
 app.use("/api/v1/projects", projectRouter);
-app.use("/api/v1/proposals", proposalRouter);
+app.use("/api/v1/proposal", proposalRouter);
+app.use("/api/v1/", authRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello from the server. 👋");
