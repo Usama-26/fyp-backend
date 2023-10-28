@@ -5,16 +5,19 @@ const app = require("./app");
 dotenv.config({ path: `${__dirname}/../config.env` });
 
 const DB = { user: process.env.DB_USER, password: process.env.DB_PASSWORD };
-
+const port = +process.env.PORT || 8000;
 mongoose
   .connect(
-    `mongodb+srv://${DB.user}:${DB.password}@fyp-database.eatlkuz.mongodb.net/`
+    `mongodb+srv://${DB.user}:${DB.password}@fyp-database.eatlkuz.mongodb.net/fyp-database`
   )
   .then((con) =>
-    console.log("Mongoose Server:", mongoose.STATES[con.connection.readyState])
+    console.log(
+      "MongoDB Atlas Server:",
+      mongoose.STATES[con.connection.readyState]
+    )
   )
   .catch((err) => console.error(err.message));
 
-app.listen(8000, () => {
-  console.log("App is running at PORT: 8000");
+app.listen(port, () => {
+  console.log("App is running at PORT: ", port);
 });
