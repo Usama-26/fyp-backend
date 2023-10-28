@@ -1,13 +1,12 @@
-const catchAsync = require('../utils/catchAsync'); // Replace with the actual path
+const catchAsync = require("../utils/catchAsync"); // Replace with the actual path
 
-const Category = require('./../models/category.model'); // Import your Category model here
+const Category = require("./../models/category.model"); // Import your Category model here
 
 // Create a new category
 const createCategory = catchAsync(async (req, res) => {
   const category = await Category.create(req.body);
-
   res.status(201).json({
-    status: 'success',
+    status: "success",
     data: category,
   });
 });
@@ -17,7 +16,7 @@ const getAllCategories = catchAsync(async (req, res) => {
   const categories = await Category.find();
 
   res.status(200).json({
-    status: 'success',
+    status: "success",
     length: categories.length,
     data: { categories },
   });
@@ -30,13 +29,13 @@ const getCategoryByPath = catchAsync(async (req, res) => {
 
   if (!category) {
     return res.status(404).json({
-      status: 'fail',
-      message: 'Category not found',
+      status: "fail",
+      message: "Category not found",
     });
   }
 
   res.status(200).json({
-    status: 'success',
+    status: "success",
     data: category,
   });
 });

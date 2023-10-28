@@ -8,6 +8,11 @@ const categorySchema = new Schema(
       unique: [true, "Category with this name already exits."],
       trim: true,
     },
+    punchline: {
+      type: String,
+      required: [true, "Punchline not provided"],
+      trim: true,
+    },
     description: {
       type: String,
       required: true,
@@ -41,13 +46,9 @@ const categorySchema = new Schema(
   { timestamps: true }
 );
 
-// categorySchema.virtuals({
-//   slug: {
-//     get: function () {
-//       return this.name.toLowerCase.replace(/\s+/g, "-");
-//     },
-//   },
-// });
+categorySchema.virtual("slug").get(function () {
+  return this.name.toLowerCase.replace(/\s+/g, "-");
+});
 
 const Category = mongoose.model("Category", categorySchema);
 
