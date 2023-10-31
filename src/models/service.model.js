@@ -29,14 +29,6 @@ const serviceSchema = new Schema(
   { timestamps: true }
 );
 
-// serviceSchema.virtuals({
-//   slug: {
-//     get: function () {
-//       return this.name.toLowerCase.replace(/\s+/g, "-");
-//     },
-//   },
-// });
-
 const Service = mongoose.model("Service", serviceSchema);
 
 module.exports = Service;
