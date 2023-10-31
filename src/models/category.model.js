@@ -24,6 +24,9 @@ const categorySchema = new Schema(
         message: "Provided image is not a url.",
       },
     },
+    path: {
+      type: String,
+    },
     featured_services: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -46,9 +49,7 @@ const categorySchema = new Schema(
   { timestamps: true }
 );
 
-categorySchema.virtual("slug").get(function () {
-  return this.name.toLowerCase.replace(/\s+/g, "-");
-});
+categorySchema.set("toJSON", { getters: true, virtuals: true });
 
 const Category = mongoose.model("Category", categorySchema);
 

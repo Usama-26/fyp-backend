@@ -1,3 +1,4 @@
+const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync"); // Replace with the actual path
 
 const Category = require("./../models/category.model"); // Import your Category model here
@@ -29,17 +30,23 @@ const getAllCategories = catchAsync(async (req, res) => {
   });
 });
 
+const getFilteredCategories = catchAsync(async (req, res) => {
+  const selectProp =
+    req.query.allProps.toLowerCase() === "true" ? "" : "name path";
+
+  const categories = await Category.find().select(selectProp);
+
+  res.status(200).json({
+    status: "success",
+    length: categories.length,
+    data: { categories },
+  });
+});
+
 // Get a category by its path
-const getCategoryByPath = catchAsync(async (req, res) => {
+const getCategoryByPath = catchAsync(async (req, res, next) => {
   const categoryPath = req.params.path;
   const category = await Category.findOne({ path: categoryPath });
-
-  if (!category) {
-    return res.status(404).json({
-      status: "fail",
-      message: "Category not found",
-    });
-  }
 
   res.status(200).json({
     status: "success",
@@ -51,4 +58,5 @@ module.exports = {
   createCategory,
   getAllCategories,
   getCategoryByPath,
+  getFilteredCategories
 };
