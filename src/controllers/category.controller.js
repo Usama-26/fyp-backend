@@ -7,6 +7,7 @@ const Category = require("./../models/category.model"); // Import your Category 
 const createCategory = async (req, res) => {
   try {
     const category = await Category.create(req.body);
+
     res.status(201).json({
       status: "success",
       data: category,
@@ -48,6 +49,9 @@ const getCategoryByPath = catchAsync(async (req, res, next) => {
   const categoryPath = req.params.path;
   const category = await Category.findOne({ path: categoryPath });
 
+  if (!category) {
+    return next(new AppError("No tour found with this id", 404));
+  }
   res.status(200).json({
     status: "success",
     data: category,
@@ -58,5 +62,5 @@ module.exports = {
   createCategory,
   getAllCategories,
   getCategoryByPath,
-  getFilteredCategories
+  getFilteredCategories,
 };

@@ -7,6 +7,7 @@ const globalErrorHandler = require("./controllers/error.controller");
 const userRouter = require("./routes/user.route");
 const categoryRouter = require("./routes/category.route");
 const reviewRouter = require("./routes/review.route");
+const authRouter = require("./routes/auth.route");
 const projectRouter = require("./routes/project.route");
 const proposalRouter = require("./routes/proposal.route");
 const AppError = require("./utils/appError");
@@ -25,6 +26,7 @@ app.use("/api/v1/users", userRouter);
 app.use("/api/v1/categories", categoryRouter);
 app.use("/api/v1/reviews", reviewRouter);
 app.use("/api/v1/projects", projectRouter);
+app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/proposal", proposalRouter);
 
 app.get("/", (req, res) => {

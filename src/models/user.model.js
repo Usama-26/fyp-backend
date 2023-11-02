@@ -45,6 +45,11 @@ const userSchema = new Schema({
   IsGoogle: {
     type: Boolean,
   },
+  userType: {
+    type: String,
+    enum: ["freelancer", "client"],
+    required: true,
+  },
 });
 
 userSchema.pre(["save"], async function (next) {
@@ -63,6 +68,10 @@ userSchema.pre(["save"], async function (next) {
   }
   next();
 });
+
+userSchema.methods.comparePassword = async function (unHashedPassword) {
+  return bcrypt.compare(unHashedPassword, this.password);
+};
 
 const User = mongoose.model("User", userSchema);
 
