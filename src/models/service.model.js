@@ -15,10 +15,12 @@ const serviceSchema = new Schema(
     Category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
+      required: true,
     },
     SubCategory: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "SubCategory",
+      required: true,
     },
     tags: [
       {

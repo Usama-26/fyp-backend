@@ -8,7 +8,6 @@ const {
   getFilteredCategories,
 } = require("./../controllers/category.controller");
 
-// Create a new category
 router.route("/").post(createCategory).get(getAllCategories);
 
 router.route("/filtered").get(getFilteredCategories);

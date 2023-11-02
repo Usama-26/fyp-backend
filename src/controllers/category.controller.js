@@ -1,26 +1,23 @@
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync"); // Replace with the actual path
-
 const Category = require("./../models/category.model"); // Import your Category model here
 
-// Create a new category
-const createCategory = async (req, res) => {
-  try {
-    const category = await Category.create(req.body);
+const createCategory = catchAsync(async (req, res, next) => {
+  const category = await Category.create(req.body);
 
-    res.status(201).json({
-      status: "success",
-      data: category,
-    });
-  } catch (err) {
-    res.status(400).json({
-      status: "fail",
-      message: err.message,
-    });
+  if (!category) {
+    return next(new AppError("Category Not Created", 400));
   }
-};
 
-// Get all categories
+  res.status(201).json({
+    status: "success",
+    data: category,
+  });
+});
+
+//  TODO
+// Create a method that sends all categories, along with sub-categories and services virtually populated
+
 const getAllCategories = catchAsync(async (req, res) => {
   const categories = await Category.find();
 

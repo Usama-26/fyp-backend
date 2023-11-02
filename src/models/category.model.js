@@ -1,5 +1,6 @@
 const { default: mongoose, Schema } = require("mongoose");
 const validator = require("validator");
+const slugify = require("slugify");
 const categorySchema = new Schema(
   {
     name: {
@@ -49,7 +50,8 @@ const categorySchema = new Schema(
   { timestamps: true }
 );
 
-categorySchema.set("toJSON", { getters: true, virtuals: true });
+//TODO
+// create pre save middle that will convert name to lowercase and convert spaced to hyphens. use slugify
 
 const Category = mongoose.model("Category", categorySchema);
 

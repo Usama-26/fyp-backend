@@ -17,8 +17,10 @@ exports.signup = catchAsync(async (req, res, next) => {
   if (user) {
     return next(new AppError("User already exists", 400));
   }
+
   const newUser = await User.create(req.body);
   const token = generateToken({ id: newUser._id, type: newUser.userType });
+
   res.status(201).json({
     status: "success",
     token,
@@ -32,16 +34,24 @@ exports.login = catchAsync(async (req, res, next) => {
   const user = await User.findOne({ email: email });
 
   if (!user) {
-    return next(new AppError("User Doesn't exist", 400));
+    return next(new AppError("Incorrect email or password.", 400));
   }
+
   if (!(await user.comparePassword(password))) {
     return next(new AppError("Incorrect password", 401));
   }
+
   const token = generateToken({ id: user._id, type: user.userType });
 
   res.status(200).json({
     status: "success",
     token,
     data: user,
+  });
+});
+
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  res.status(200).json({
+    status: "success",
   });
 });
