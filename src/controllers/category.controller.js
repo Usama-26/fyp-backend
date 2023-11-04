@@ -1,26 +1,42 @@
+const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync"); // Replace with the actual path
-
 const Category = require("./../models/category.model"); // Import your Category model here
 
-// Create a new category
-const createCategory = async (req, res) => {
-  try {
-    const category = await Category.create(req.body);
-    res.status(201).json({
-      status: "success",
-      data: category,
-    });
-  } catch (err) {
-    res.status(400).json({
-      status: "fail",
-      message: err.message,
-    });
-  }
-};
+const createCategory = catchAsync(async (req, res, next) => {
+  const category = await Category.create(req.body);
 
-// Get all categories
+  if (!category) {
+    return next(new AppError("Category Not Created", 400));
+  }
+
+  res.status(201).json({
+    status: "success",
+    data: category,
+  });
+});
+
+//  TODO
+// Create a method that sends all categories, along with sub-categories and services virtually populated
 const getAllCategories = catchAsync(async (req, res) => {
-  const categories = await Category.find();
+  const categories = await Category.find().populate({
+    path: 'sub_categories',
+    populate: {
+      path: 'services',
+    },
+  });
+
+  res.status(200).json({
+    status: "success",
+    length: categories.length,
+    data: { categories },
+  });
+});
+
+const getFilteredCategories = catchAsync(async (req, res) => {
+  const selectProp =
+    req.query.allProps.toLowerCase() === "true" ? "" : "name path";
+
+  const categories = await Category.find().select(selectProp);
 
   res.status(200).json({
     status: "success",
@@ -30,17 +46,13 @@ const getAllCategories = catchAsync(async (req, res) => {
 });
 
 // Get a category by its path
-const getCategoryByPath = catchAsync(async (req, res) => {
+const getCategoryByPath = catchAsync(async (req, res, next) => {
   const categoryPath = req.params.path;
   const category = await Category.findOne({ path: categoryPath });
 
   if (!category) {
-    return res.status(404).json({
-      status: "fail",
-      message: "Category not found",
-    });
+    return next(new AppError("No tour found with this id", 404));
   }
-
   res.status(200).json({
     status: "success",
     data: category,
@@ -51,4 +63,5 @@ module.exports = {
   createCategory,
   getAllCategories,
   getCategoryByPath,
+  getFilteredCategories,
 };

@@ -1,11 +1,12 @@
 const { default: mongoose, Schema } = require("mongoose");
 const validator = require("validator");
+const slugify = require("slugify");
 const categorySchema = new Schema(
   {
     name: {
       type: String,
       required: [true, "Name not provided."],
-      unique: [true, "Category with this name already exits."],
+      unique: [true, "Category with this name already exists."],
       trim: true,
     },
     punchline: {
@@ -21,8 +22,11 @@ const categorySchema = new Schema(
       type: String,
       validate: {
         validator: validator.isURL,
-        message: "Provided image is not a url.",
+        message: "Provided image is not a URL.",
       },
+    },
+    path: {
+      type: String,
     },
     featured_services: [
       {
@@ -46,8 +50,10 @@ const categorySchema = new Schema(
   { timestamps: true }
 );
 
-categorySchema.virtual("slug").get(function () {
-  return this.name.toLowerCase.replace(/\s+/g, "-");
+// Create pre-save middleware to slugify the name
+categorySchema.pre("save", function (next) {
+  this.path = slugify(this.name, { lower: true, replacement: "-" });
+  next();
 });
 
 const Category = mongoose.model("Category", categorySchema);

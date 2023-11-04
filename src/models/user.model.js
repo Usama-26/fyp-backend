@@ -45,6 +45,9 @@ const userSchema = new Schema({
   IsGoogle: {
     type: Boolean,
   },
+  IsGoogle: {
+    type: Boolean,
+  }
 });
 
 userSchema.pre(["save"], async function (next) {

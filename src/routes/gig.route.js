@@ -1,15 +1,18 @@
-import express from "express";
-const {
-  createGig,
-  deleteGig,
-  getGig,
-  getGigs,
-} = require("./../controllers/gig.controller");
+const express = require("express");
 const router = express.Router();
+
+const {
+  getGigById,
+  getAllGigs,
+  deleteGig,
+  updateGig,
+  createGig
+} = require("./../controllers/gig.controller");
 
 router.post("/", createGig);
 router.delete("/:id", deleteGig);
-router.get("/single/:id", getGig);
-router.get("/", getGigs);
+router.get("/single/:id", getGigById);
+router.get("/", getAllGigs);
+router.patch("/single/:id", updateGig);
 
-export default router;
+module.exports = router;
