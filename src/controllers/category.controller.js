@@ -17,13 +17,9 @@ const createCategory = catchAsync(async (req, res, next) => {
 
 //  TODO
 // Create a method that sends all categories, along with sub-categories and services virtually populated
+
 const getAllCategories = catchAsync(async (req, res) => {
-  const categories = await Category.find().populate({
-    path: 'sub_categories',
-    populate: {
-      path: 'services',
-    },
-  });
+  const categories = await Category.find();
 
   res.status(200).json({
     status: "success",

@@ -6,7 +6,7 @@ const categorySchema = new Schema(
     name: {
       type: String,
       required: [true, "Name not provided."],
-      unique: [true, "Category with this name already exists."],
+      unique: [true, "Category with this name already exits."],
       trim: true,
     },
     punchline: {
@@ -22,7 +22,7 @@ const categorySchema = new Schema(
       type: String,
       validate: {
         validator: validator.isURL,
-        message: "Provided image is not a URL.",
+        message: "Provided image is not a url.",
       },
     },
     path: {
@@ -50,11 +50,8 @@ const categorySchema = new Schema(
   { timestamps: true }
 );
 
-// Create pre-save middleware to slugify the name
-categorySchema.pre("save", function (next) {
-  this.path = slugify(this.name, { lower: true, replacement: "-" });
-  next();
-});
+//TODO
+// create pre save middle that will convert name to lowercase and convert spaced to hyphens. use slugify
 
 const Category = mongoose.model("Category", categorySchema);
 
