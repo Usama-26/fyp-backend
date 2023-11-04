@@ -13,20 +13,20 @@ const userSchema = new Schema({
     type: String,
     required: [true, "Last Name is not provided."],
   },
-  username: {
-    type: String,
-    unique: true,
-    required: [true, "A username is required to create a user."],
-    minLength: [8, "A username should be minimum of 8 characters"],
-    maxLength: [24, "A username should be maximum of 24 characters"],
-    validate: {
-      validator: function (val) {
-        return /^[a-z0-9_]{8,24}$/.test(val);
-      },
-      message:
-        "A username should contain only lowercase letters, numbers and underscores.",
-    },
-  },
+  // username: {
+  //   type: String,
+  //   unique: true,
+  //   required: [true, "A username is required to create a user."],
+  //   minLength: [8, "A username should be minimum of 8 characters"],
+  //   maxLength: [24, "A username should be maximum of 24 characters"],
+  //   validate: {
+  //     validator: function (val) {
+  //       return /^[a-z0-9_]{8,24}$/.test(val);
+  //     },
+  //     message:
+  //       "A username should contain only lowercase letters, numbers and underscores.",
+  //   },
+  // },
   email: {
     type: String,
     unique: true,
@@ -71,6 +71,20 @@ userSchema.pre(["save"], async function (next) {
 
 userSchema.methods.comparePassword = async function (unHashedPassword) {
   return bcrypt.compare(unHashedPassword, this.password);
+};
+
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+  if (this.passwordChangedAt) {
+    const changedTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    );
+
+    return JWTTimestamp < changedTimestamp;
+  }
+
+  // False means NOT changed
+  return false;
 };
 
 const User = mongoose.model("User", userSchema);

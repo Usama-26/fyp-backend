@@ -4,15 +4,16 @@ const {
   signup,
   login,
   resetPassword,
+  protect,
+  getCurrentUser,
 } = require("./../controllers/auth.controller");
 
-// User registration
 router.post("/signup", signup);
 
-// User login
 router.post("/login", login);
 
-// Reset Password
-router.post("/passwordReset", resetPassword);
+router.post("/resetPassword", resetPassword);
+
+router.get("/getCurrentUser", protect, getCurrentUser);
 
 module.exports = router;
