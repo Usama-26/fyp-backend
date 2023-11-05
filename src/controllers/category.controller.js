@@ -1,54 +1,72 @@
+const Category = require("../models/category.model");
 const AppError = require("../utils/appError");
-const catchAsync = require("../utils/catchAsync"); // Replace with the actual path
-const Category = require("./../models/category.model"); // Import your Category model here
+const catchAsync = require("../utils/catchAsync");
+
+const getAllCategories = catchAsync(async (req, res, next) => {
+  const categories = await Category.find()
+    .select("path name")
+    .populate({
+      path: "sub_categories",
+      select: "path name",
+      populate: { path: "services", select: "path name" },
+    });
+
+  res.status(200).json({
+    status: "success",
+    length: categories.length,
+    data: categories,
+  });
+});
 
 const createCategory = catchAsync(async (req, res, next) => {
   const category = await Category.create(req.body);
 
-  if (!category) {
-    return next(new AppError("Category Not Created", 400));
-  }
-
-  res.status(201).json({
+  res.status(200).json({
     status: "success",
     data: category,
   });
 });
 
-//  TODO
-// Create a method that sends all categories, along with sub-categories and services virtually populated
-
-const getAllCategories = catchAsync(async (req, res) => {
-  const categories = await Category.find();
+const getCategory = catchAsync(async (req, res, next) => {
+  const category = await Category.findById(req.params.id).populate({
+    path: "sub_categories",
+    select: "path name",
+  });
 
   res.status(200).json({
     status: "success",
-    length: categories.length,
-    data: { categories },
+    data: category,
   });
 });
 
-const getFilteredCategories = catchAsync(async (req, res) => {
-  const selectProp =
-    req.query.allProps.toLowerCase() === "true" ? "" : "name path";
+const deleteCategory = catchAsync(async (req, res, next) => {
+  const category = await Category.findByIdAndDelete(req.params.id);
 
-  const categories = await Category.find().select(selectProp);
+  res.status(204).json({
+    status: "success",
+  });
+});
+
+const updateCategory = catchAsync(async (req, res, next) => {
+  const category = await Category.findByIdAndUpdate(req.params.id);
 
   res.status(200).json({
     status: "success",
-    length: categories.length,
-    data: { categories },
+    data: category,
   });
 });
 
-// Get a category by its path
 const getCategoryByPath = catchAsync(async (req, res, next) => {
-  const categoryPath = req.params.path;
-  const category = await Category.findOne({ path: categoryPath });
+  console.log(req.params);
+  const category = await Category.findOne({ path: req.params.path }).populate({
+    path: "sub_categories",
+    select: "path name",
+    populate: {
+      path: "services",
+      select: "path name",
+    },
+  });
 
-  if (!category) {
-    return next(new AppError("No tour found with this id", 404));
-  }
   res.status(200).json({
     status: "success",
     data: category,
@@ -56,8 +74,10 @@ const getCategoryByPath = catchAsync(async (req, res, next) => {
 });
 
 module.exports = {
-  createCategory,
   getAllCategories,
+  createCategory,
+  getCategory,
+  deleteCategory,
+  updateCategory,
   getCategoryByPath,
-  getFilteredCategories,
 };

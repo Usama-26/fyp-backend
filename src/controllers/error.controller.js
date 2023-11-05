@@ -1,3 +1,5 @@
+const AppError = require("../utils/appError");
+
 const sendDevErr = (err, req, res, next) => {
   res.status(err.statusCode).json({
     status: err.status,
@@ -24,9 +26,8 @@ const handleCastErrorDB = (err) => {
 };
 
 const handleDuplicateFieldsDB = (err) => {
-  const value = err.errmsg.match(/(["'])(\\?.)*?\1/)[0];
-
-  const message = `A unique field with value: ${value} Already exists. Please try another one`;
+  const { keyValue } = err;
+  const message = `A unique field with value: "${keyValue.name}"  Already exists. Please try another one`;
   return new AppError(message, 400);
 };
 
@@ -48,6 +49,7 @@ module.exports = (err, req, res, next) => {
   err.status = err.status || "error";
 
   let error = { ...err };
+
   if (error.name === "CastError") error = handleCastErrorDB(error);
   if (error.code === 11000) error = handleDuplicateFieldsDB(error);
   if (error.name === "ValidationError") error = handleValidationErrorDB(error);
