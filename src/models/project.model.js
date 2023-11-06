@@ -19,7 +19,6 @@ const projectSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
-  // Additional fields like project status, deadline, etc.
 });
 
 const Project = mongoose.model('Project', projectSchema);

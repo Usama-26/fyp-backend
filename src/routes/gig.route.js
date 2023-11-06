@@ -9,10 +9,8 @@ const {
   createGig
 } = require("./../controllers/gig.controller");
 
-router.post("/", createGig);
-router.delete("/:id", deleteGig);
-router.get("/single/:id", getGigById);
-router.get("/", getAllGigs);
-router.patch("/single/:id", updateGig);
+router.route('/').get(getAllGigs).post(createGig);
+
+router.route('/:id').get(getGigById).delete(deleteGig).patch(updateGig)
 
 module.exports = router;

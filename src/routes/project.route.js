@@ -5,10 +5,9 @@ const {
   createProject,
   getAllProjects,
   getProjectById,
-  deleteProject,
-  updateProject
+  updateProject,
+  deleteProject
 } = require('./../controllers/project.controller');
-
 
 router.route('/').post(createProject).get(getAllProjects);
 

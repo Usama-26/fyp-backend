@@ -13,6 +13,7 @@ const authRouter = require("./routes/auth.route");
 const projectRouter = require("./routes/project.route");
 const proposalRouter = require("./routes/proposal.route");
 const AppError = require("./utils/appError");
+const gigRouter = require("./routes/gig.route");
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use("/api/v1/reviews", reviewRouter);
 app.use("/api/v1/projects", projectRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/proposal", proposalRouter);
+app.use("/api/v1/gigs", gigRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello from the server. 👋");

@@ -1,6 +1,6 @@
 const Gig = require('../models/gig.model');
+const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
-const errorHandler = require('../controllers/error.controller');
 
 // Create a new Gig
 const createGig = catchAsync(async (req, res, next) => {
@@ -19,7 +19,7 @@ const updateGig = catchAsync(async (req, res, next) => {
   });
 
   if (!gig) {
-    return next (new errorHandler('No gig found', 404))
+    return next(new AppError('No gig found', 404));
   }
 
   res.status(200).json({
@@ -31,12 +31,9 @@ const updateGig = catchAsync(async (req, res, next) => {
 // Get all Gigs
 const getAllGigs = catchAsync(async (req, res, next) => {
   const gigs = await Gig.find();
+
   if (!gigs || gigs.length === 0) {
-    return next({
-      statusCode: 404,
-      status: 'fail',
-      message: 'No Gig Found',
-    });
+    return next(new AppError('No Gig Found', 404));
   }
 
   res.status(200).json({
@@ -46,13 +43,12 @@ const getAllGigs = catchAsync(async (req, res, next) => {
   });
 });
 
-
 // Get a Gig by ID
 const getGigById = catchAsync(async (req, res, next) => {
   const gig = await Gig.findById(req.params.id);
 
   if (!gig) {
-    return errorHandler('No gig found', 404)
+    return next(new AppError('No gig found', 404));
   }
 
   res.status(200).json({
@@ -66,7 +62,7 @@ const deleteGig = catchAsync(async (req, res, next) => {
   const gig = await Gig.findByIdAndDelete(req.params.id);
 
   if (!gig) {
-    return next (new errorHandler('Gig not found', 404))
+    return next(new AppError('Gig not found', 404));
   }
 
   res.status(204).json({
@@ -80,5 +76,5 @@ module.exports = {
   getAllGigs,
   deleteGig,
   updateGig,
-  createGig
-}
+  createGig,
+};
