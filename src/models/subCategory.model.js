@@ -1,25 +1,28 @@
 const { default: mongoose, Schema } = require("mongoose");
-
+const slugify = require("slugify");
+const Category = require("./category.model");
+const AppError = require("../utils/appError");
 const subCategorySchema = new Schema(
   {
     name: {
       type: String,
       required: true,
+      unique: true,
     },
-    description: {
+    punchline: {
       type: String,
       required: true,
     },
-    image: {
+    path: {
       type: String,
-      validate: {
-        validator: validator.isURL,
-        message: "Provided image is not a url.",
-      },
+    },
+    category: {
+      type: Schema.Types.ObjectId,
+      ref: "Category",
     },
     services: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "Service",
       },
     ],
@@ -32,14 +35,14 @@ const subCategorySchema = new Schema(
           type: Number,
         },
         posted_by: {
-          type: mongoose.Schema.Types.ObjectId,
+          type: Schema.Types.ObjectId,
           ref: "User",
         },
       },
     ],
     top_sellers: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "User",
       },
     ],
@@ -47,12 +50,55 @@ const subCategorySchema = new Schema(
   { timestamps: true }
 );
 
-subCategorySchema.virtuals({
-  slug: {
-    get: function () {
-      return this.name.toLowerCase.replace(/\s+/g, "-");
-    },
-  },
+subCategorySchema.pre("save", function (next) {
+  // Generate the 'path' property using slugify
+  this.path = slugify(this.name.toLowerCase(), {
+    replacement: "-",
+    lower: true,
+  });
+  next();
+});
+
+subCategorySchema.pre("findOneAndDelete", async function (next) {
+  try {
+    const category = await Category.updateOne(
+      { _id: this.category },
+      { $pull: { sub_categories: this._id } },
+      { new: true }
+    );
+
+    if (!category) {
+      next(
+        new AppError(
+          "Invalid Category: This Category might have been moved or doesn't exist",
+          404
+        )
+      );
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+subCategorySchema.post("save", async function (next) {
+  try {
+    const category = await Category.updateOne(
+      { _id: this.category },
+      { $push: { sub_categories: this._id } },
+      { new: true }
+    );
+
+    if (!category) {
+      next(
+        new AppError(
+          "Invalid Category: This Category might have been moved or doesn't exist",
+          404
+        )
+      );
+    }
+  } catch (error) {
+    next(error);
+  }
 });
 
 const SubCategory = mongoose.model("SubCategory", subCategorySchema);

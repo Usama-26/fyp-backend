@@ -1,18 +1,22 @@
 const express = require("express");
 const router = express.Router();
-
 const {
-  createCategory,
   getAllCategories,
+  createCategory,
+  getCategory,
+  deleteCategory,
+  updateCategory,
   getCategoryByPath,
-  getFilteredCategories,
 } = require("./../controllers/category.controller");
 
 router.route("/").post(createCategory).get(getAllCategories);
 
-router.route("/filtered").get(getFilteredCategories);
+router
+  .route("/:id")
+  .get(getCategory)
+  .patch(updateCategory)
+  .delete(deleteCategory);
 
-// Get a category by its path
-router.get("/:path", getCategoryByPath);
+router.get("/get_by_path/:path", getCategoryByPath);
 
 module.exports = router;

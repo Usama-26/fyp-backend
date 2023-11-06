@@ -30,28 +30,34 @@ const categorySchema = new Schema(
     },
     featured_services: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "Service",
       },
     ],
     popular_services: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "Service",
       },
     ],
     sub_categories: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "SubCategory",
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-//TODO
-// create pre save middle that will convert name to lowercase and convert spaced to hyphens. use slugify
+categorySchema.pre("save", function (next) {
+  // Generate the 'path' property using slugify
+  this.path = slugify(this.name.toLowerCase(), {
+    replacement: "-",
+    lower: true,
+  });
+  next();
+});
 
 const Category = mongoose.model("Category", categorySchema);
 
