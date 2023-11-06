@@ -1,10 +1,10 @@
 const catchAsync = require('../utils/catchAsync');
 const Project = require('./../models/project.model');
+const AppError = require('../utils/appError');
 
 // Create a new project
-const createProject = catchAsync(async (req, res) => {
-  const projectData = req.body;
-  const project = await Project.create(projectData);
+const createProject = catchAsync(async (req, res, next) => {
+  const project = await Project.create(req.body);
 
   res.status(201).json({
     status: 'success',
@@ -13,7 +13,7 @@ const createProject = catchAsync(async (req, res) => {
 });
 
 // Get all projects
-const getAllProjects = catchAsync(async (req, res) => {
+const getAllProjects = catchAsync(async (req, res, next) => {
   const projects = await Project.find();
 
   res.status(200).json({
@@ -24,15 +24,12 @@ const getAllProjects = catchAsync(async (req, res) => {
 });
 
 // Get a project by its ID
-const getProjectById = catchAsync(async (req, res) => {
+const getProjectById = catchAsync(async (req, res, next) => {
   const projectId = req.params.id;
   const project = await Project.findById(projectId);
 
   if (!project) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Project not found',
-    });
+    return next(new AppError('Project not found', 404));
   }
 
   res.status(200).json({
@@ -42,20 +39,16 @@ const getProjectById = catchAsync(async (req, res) => {
 });
 
 // Update a project by its ID
-const updateProject = catchAsync(async (req, res) => {
-  const projectId = req.params.id;
+const updateProject = catchAsync(async (req, res, next) => {
   const updatedData = req.body;
 
-  const updatedProject = await Project.findByIdAndUpdate(projectId, updatedData, {
+  const updatedProject = await Project.findByIdAndUpdate(req.params.id, updatedData, {
     new: true, // Return the updated project
     runValidators: true, // Run validators on updated fields
   });
 
   if (!updatedProject) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Project not found',
-    });
+    return next(new AppError('Project not found', 404));
   }
 
   res.status(200).json({
@@ -65,19 +58,18 @@ const updateProject = catchAsync(async (req, res) => {
 });
 
 // Delete a project by its ID
-const deleteProject = catchAsync(async (req, res) => {
+const deleteProject = catchAsync(async (req, res, next) => {
   const projectId = req.params.id;
 
   const deletedProject = await Project.findByIdAndDelete(projectId);
 
   if (!deletedProject) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Project not found',
-    });
+    return next(new AppError('Project not found', 404));
   }
 
-  res.status(204).json(); // 204 No Content (success without data)
+  res.status(204).json({
+    status: "success",
+  });
 });
 
 module.exports = {

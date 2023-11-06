@@ -1,28 +1,52 @@
-const mongoose = require('mongoose');
+const { default: mongoose, Schema } = require("mongoose");
 
-const reviewSchema = new mongoose.Schema({
-  sellerUserId: {
+// Base review schema
+const reviewSchema = new Schema({
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // Reference to the User model (replace with the actual name of your user model)
-    required: true,
-  },
-  buyerUserId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // Reference to the User model
-    required: true,
-  },
-  projectId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Project', // Reference to the Project model (if applicable)
+    ref: 'User',
     required: true,
   },
   rating: {
     type: Number,
     required: true,
+    min: 1,
+    max: 5,
   },
-  comment: String,
+  comment: {
+    type: String,
+    required: true,
+  },
+}, {
+  timestamps: true,
+});
+
+// Create a project review schema as a discriminator of the base review schema
+const projectReviewSchema = reviewSchema.clone();
+projectReviewSchema.add({
+  projectId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Project',
+    required: true,
+  },
+});
+
+// Create a gig review schema as a discriminator of the base review schema
+const gigReviewSchema = reviewSchema.clone();
+gigReviewSchema.add({
+  gigId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Gig',
+    required: true,
+  },
 });
 
 const Review = mongoose.model('Review', reviewSchema);
+const ProjectReview = Review.discriminator('ProjectReview', projectReviewSchema);
+const GigReview = Review.discriminator('GigReview', gigReviewSchema);
 
-module.exports = Review;
+module.exports = {
+  Review,
+  ProjectReview,
+  GigReview,
+};
