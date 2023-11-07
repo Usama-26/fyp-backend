@@ -112,11 +112,10 @@ exports.withGoogle = catchAsync(async (req, res, next) => {
   let token;
 
   if (user) {
-    console.log("111", user);
     if (user.with_google) {
       token = generateToken({ id: user._id, type: user.user_type });
 
-      res.status(200).json({
+      return res.status(200).json({
         status: "success",
         token,
         data: user,
@@ -140,7 +139,7 @@ exports.withGoogle = catchAsync(async (req, res, next) => {
   const newUser = await User.create(userData);
   token = generateToken({ id: newUser._id, type: newUser.user_type });
 
-  res.status(201).json({
+  return res.status(201).json({
     status: "success",
     token,
     data: newUser,
