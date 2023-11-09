@@ -12,8 +12,8 @@ const reviewRouter = require("./routes/review.route");
 const authRouter = require("./routes/auth.route");
 const projectRouter = require("./routes/project.route");
 const proposalRouter = require("./routes/proposal.route");
-const AppError = require("./utils/appError");
 const gigRouter = require("./routes/gig.route");
+const AppError = require("./utils/appError");
 
 const app = express();
 

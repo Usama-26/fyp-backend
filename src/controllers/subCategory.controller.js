@@ -64,6 +64,25 @@ const getSubCategoryByPath = catchAsync(async (req, res, next) => {
   });
 });
 
+const getSubcategoriesByCategory = catchAsync(async (req, res, next) => {
+  const categoryId = req.query.category;
+
+  // Find the category by ID
+  const category = await Category.findById(categoryId);
+
+  if (!category) {
+    return res.status(404).json({ message: 'Category not found' });
+  }
+
+  // Find subcategories that belong to the specified category
+  const subcategories = await SubCategory.find({ category: categoryId });
+
+  res.status(200).json({
+    message: 'Subcategories found',
+    data: subcategories,
+  });
+});
+
 module.exports = {
   getAllSubCategories,
   createSubCategory,
@@ -71,4 +90,5 @@ module.exports = {
   deleteSubCategory,
   updateSubCategory,
   getSubCategoryByPath,
+  getSubcategoriesByCategory
 };
