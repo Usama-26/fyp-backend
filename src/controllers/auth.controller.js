@@ -20,13 +20,19 @@ exports.signup = catchAsync(async (req, res, next) => {
   const user = await User.findOne({ email: email });
 
   if (user) {
-    return next(
-      new AppError("A user with this email already exists. Try login.", 400)
-    );
+    if (user.with_google) {
+      return next(
+        new AppError(
+          "This user was previously joined by a different authentication method."
+        )
+      );
+    } else {
+      return next(new AppError("This user already exists. Try login."));
+    }
   }
 
   const newUser = await User.create(req.body);
-  const token = generateToken({ id: newUser._id, type: newUser.userType });
+  const token = generateToken({ id: newUser._id, type: newUser.user_type });
 
   res.status(201).json({
     status: "success",
@@ -37,18 +43,23 @@ exports.signup = catchAsync(async (req, res, next) => {
 
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
-
   const user = await User.findOne({ email: email });
 
   if (!user) {
     return next(new AppError("Incorrect email or password.", 400));
   }
 
+  if (user.with_google) {
+    return next(
+      new AppError("This user wasn't signed in by this method.", 400)
+    );
+  }
+
   if (!(await user.comparePassword(password))) {
     return next(new AppError("Incorrect email or password", 400));
   }
 
-  const token = generateToken({ id: user._id, type: user.userType });
+  const token = generateToken({ id: user._id, type: user.user_type });
 
   res.status(200).json({
     status: "success",
@@ -95,6 +106,50 @@ exports.protect = catchAsync(async (req, res, next) => {
   req.user = currentUser;
   res.locals.user = currentUser;
   next();
+});
+
+exports.withGoogle = catchAsync(async (req, res, next) => {
+  const googleToken = req.headers["google-auth-token"];
+  const userType = req.headers["user-type"];
+  const decoded = jwt.decode(googleToken);
+  const user = await User.findOne({ email: decoded.email });
+
+  let token;
+
+  if (user) {
+    console.log("111", user);
+    if (user.with_google) {
+      token = generateToken({ id: user._id, type: user.user_type });
+
+      res.status(200).json({
+        status: "success",
+        token,
+        data: user,
+      });
+    } else {
+      return next(
+        new AppError("This user wasn't signed in by this method.", 400)
+      );
+    }
+  }
+
+  const userData = {
+    email: decoded.email,
+    firstName: decoded.given_name,
+    lastName: decoded.family_name,
+    email_verified: decoded.email_verified,
+    with_google: true,
+    user_type: userType,
+  };
+
+  const newUser = await User.create(userData);
+  token = generateToken({ id: newUser._id, type: newUser.user_type });
+
+  res.status(201).json({
+    status: "success",
+    token,
+    data: newUser,
+  });
 });
 
 exports.getCurrentUser = catchAsync(async (req, res, next) => {

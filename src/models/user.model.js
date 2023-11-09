@@ -36,16 +36,23 @@ const userSchema = new Schema({
       message: "Entered email is invalid.",
     },
   },
+  email_verified: { type: Boolean },
+  profile_photo: {
+    type: String,
+    validate: {
+      validator: validator.isURL,
+      message: "Invalid Profile Photo URL.",
+    },
+  },
   password: {
     type: String,
-    required: [true, "A password must be set to secure user account."],
     minLength: [8, "The password should be at least 8 characters long"],
     maxLength: [24, "The password should be utmost 24 characters long"],
   },
-  IsGoogle: {
+  with_google: {
     type: Boolean,
   },
-  userType: {
+  user_type: {
     type: String,
     enum: ["freelancer", "client"],
     required: true,
