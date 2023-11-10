@@ -64,6 +64,20 @@ const getSubCategoryByPath = catchAsync(async (req, res, next) => {
   });
 });
 
+const getByCategory = catchAsync(async (req, res, next) => {
+  const subCategories = await SubCategory.find({
+    category: req.params.categoryId,
+  }).select("name");
+
+  if (!subCategories) {
+    return next(new AppError("No Services Found", 400));
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: subCategories,
+  });
+});
 module.exports = {
   getAllSubCategories,
   createSubCategory,
@@ -71,4 +85,5 @@ module.exports = {
   deleteSubCategory,
   updateSubCategory,
   getSubCategoryByPath,
+  getByCategory,
 };
