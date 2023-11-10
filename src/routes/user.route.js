@@ -7,9 +7,10 @@ const {
   deleteUser,
   getUserById,
 } = require("../controllers/user.controller");
+const { protect } = require("../controllers/auth.controller");
 
-router.route("/").get(getAllUsers).post(createUser);
+router.route("/").get(getAllUsers).post(protect, createUser);
 
-router.route("/:id").delete(deleteUser).patch(updateUser).get(getUserById);
+router.route("/:id").delete(protect, deleteUser).patch(protect, updateUser).get(getUserById);
 
 module.exports = router;

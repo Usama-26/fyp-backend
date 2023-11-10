@@ -5,9 +5,10 @@ const {
   getAllProposalsForProject,
   getProposalById
 } = require('./../controllers/proposal.controller');
+const { protect } = require("../controllers/auth.controller");
 
 // Create a new proposal
-router.route('/').post(createProposal);
+router.route('/').post(protect, createProposal);
 
 // Get all proposals for a specific project
 router.get('/project/:projectId', getAllProposalsForProject);

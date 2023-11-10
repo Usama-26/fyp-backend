@@ -1,6 +1,7 @@
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const Service = require("./../models/service.model");
+const SubCategory = require("../models/subCategory.model");
 
 const getAllServices = catchAsync(async (req, res, next) => {
   const services = await Service.find();
@@ -56,6 +57,21 @@ const getServiceByPath = catchAsync(async (req, res, next) => {
   });
 });
 
+const getBySubCategory = catchAsync(async (req, res, next) => {
+  const services = await Service.find({
+    sub_category: req.params.subcategoryId,
+  }).select("name");
+
+  if (!services) {
+    return next(new AppError("No Services Found", 400));
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: services,
+  });
+});
+
 module.exports = {
   getAllServices,
   createService,
@@ -63,4 +79,5 @@ module.exports = {
   deleteService,
   updateService,
   getServiceByPath,
+  getBySubCategory
 };

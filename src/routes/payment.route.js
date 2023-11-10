@@ -5,9 +5,10 @@ const {
   getAllPaymentsForContract,
   getPaymentById
 } = require('../controllers/payment.controller');
+const { protect } = require("../controllers/auth.controller");
 
 // Create a new payment
-router.post('/payments', createPayment);
+router.post('/payments', protect,  createPayment);
 
 // Get all payments for a specific contract
 router.get('/payments/contract/:contractId', getAllPaymentsForContract);

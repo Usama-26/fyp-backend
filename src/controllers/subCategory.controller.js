@@ -78,6 +78,7 @@ const getByCategory = catchAsync(async (req, res, next) => {
     data: subCategories,
   });
 });
+
 module.exports = {
   getAllSubCategories,
   createSubCategory,

@@ -121,7 +121,7 @@ exports.withGoogle = catchAsync(async (req, res, next) => {
     if (user.with_google) {
       token = generateToken({ id: user._id, type: user.user_type });
 
-      res.status(200).json({
+      return res.status(200).json({
         status: "success",
         token,
         data: user,
@@ -168,6 +168,10 @@ exports.sendResetPassMail = catchAsync(async (req, res, next) => {
     return next(new AppError("Email not found", 400));
   }
 
+  if (user.with_google) {
+    return next(new AppError("User signed in with google. Can't reset password", 400));
+  }
+
   // Generate a reset token
   const resetToken = generateToken({ id: email });
 
@@ -195,12 +199,11 @@ exports.sendResetPassMail = catchAsync(async (req, res, next) => {
 
   await transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
-      console.log("Error sending email:", error);
+      return next(new AppError(`Error sending email: ${error}}`, 400));
     } else {
-      console.log("Email sent:", info.response);
       res.status(200).json({
         status: "success",
-        data: info.response,
+        message: "Password reset link sent to " + email + " Kindly check your inbox.",
       });
     }
   });

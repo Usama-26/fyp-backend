@@ -11,9 +11,6 @@ const serviceSchema = new Schema(
       unique: [true, "Category with this name already exits."],
       trim: true,
     },
-    description: {
-      type: String,
-    },
     path: {
       type: String,
     },

@@ -8,9 +8,10 @@ const {
   updateGig,
   createGig
 } = require("./../controllers/gig.controller");
+const { protect } = require("../controllers/auth.controller");
 
-router.route('/').get(getAllGigs).post(createGig);
+router.route('/').get(getAllGigs).post(protect, createGig);
 
-router.route('/:id').get(getGigById).delete(deleteGig).patch(updateGig)
+router.route('/:id').get(getGigById).delete(protect, deleteGig).patch(protect, updateGig)
 
 module.exports = router;

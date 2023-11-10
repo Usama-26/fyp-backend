@@ -7,10 +7,11 @@ const {
   updateReview,
   deleteReview,
 } = require('./../controllers/review.controller');
+const { protect } = require("../controllers/auth.controller");
 
 // Create a new review
-router.route('/').post(createReview).get(getAllReviews);
+router.route('/').post(protect, createReview).get(getAllReviews);
 
-router.route('/:id').delete(deleteReview).patch(updateReview).get(getReviewById)
+router.route('/:id').delete(protect, deleteReview).patch(protect, updateReview).get(getReviewById)
 
 module.exports = router;

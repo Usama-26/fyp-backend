@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { protect } = require("../controllers/auth.controller");
 
 const {
   createProject,
@@ -9,8 +10,8 @@ const {
   deleteProject
 } = require('./../controllers/project.controller');
 
-router.route('/').post(createProject).get(getAllProjects);
+router.route('/').post(protect, createProject).get(getAllProjects);
 
-router.route('/:id').get(getProjectById).delete(deleteProject).patch(updateProject);
+router.route('/:id').get(getProjectById).delete(protect, deleteProject).patch(protect, updateProject);
 
 module.exports = router;
