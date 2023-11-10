@@ -7,7 +7,7 @@ const {
   deleteSubCategory,
   updateSubCategory,
   getSubCategoryByPath,
-  getSubcategoriesByCategory
+  getByCategory,
 } = require("./../controllers/subCategory.controller");
 
 router.route("/").get(getAllSubCategories).post(createSubCategory);
@@ -20,6 +20,6 @@ router
 
 router.get("/get_by_path/:path", getSubCategoryByPath);
 
-router.get('/find_by_category?categoryId', getSubcategoriesByCategory);
+router.get("/find_by_category/:categoryId", getByCategory);
 
 module.exports = router;

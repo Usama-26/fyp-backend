@@ -6,7 +6,7 @@ const {
   sendResetPassMail,
   protect,
   getCurrentUser,
-  forgetPassword
+  resetPassword,
 } = require("./../controllers/auth.controller");
 
 router.post("/signup", signup);
@@ -15,7 +15,7 @@ router.post("/login", login);
 
 router.post("/forgetPassword", sendResetPassMail);
 
-router.post("/resetPassword", forgetPassword);
+router.post("/resetPassword", resetPassword);
 
 router.get("/getCurrentUser", protect, getCurrentUser);
 

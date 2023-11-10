@@ -6,7 +6,7 @@ const User = require("./../models/user.model");
 const bcrypt = require("bcryptjs");
 const validator = require("validator");
 
-const nodemailer = require('nodemailer');
+const nodemailer = require("nodemailer");
 const { hash } = require("bcrypt");
 
 function generateToken(payload) {
@@ -176,28 +176,28 @@ exports.sendResetPassMail = catchAsync(async (req, res, next) => {
 
   // Create a transporter using SMTP settings
   const transporter = nodemailer.createTransport({
-    host: 'smtp-relay.brevo.com',
+    host: "smtp-relay.brevo.com",
     port: 587,
     secure: false, // true for 465, false for other ports
     auth: {
-      user: 'taimoorahamed95959@gmail.com',
-      pass: '5HUmBnIY7jO38dys'
+      user: "taimoorahamed95959@gmail.com",
+      pass: "5HUmBnIY7jO38dys",
     },
   });
 
   const mailOptions = {
-    from: 'support@workchain.com',
+    from: "support@workchain.com",
     to: email,
-    subject: 'Password Reset Request',
-    text: 'This is a test email',
+    subject: "Password Reset Request",
+    text: "This is a test email",
     html: `<p>To reset your password, please click on the following link: <a href="${resetLink}">here</a></p>`,
   };
 
-  await transporter.sendMail(mailOptions, function(error, info) {
+  await transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
-      console.log('Error sending email:', error);
+      console.log("Error sending email:", error);
     } else {
-      console.log('Email sent:', info.response);
+      console.log("Email sent:", info.response);
       res.status(200).json({
         status: "success",
         data: info.response,
@@ -206,8 +206,8 @@ exports.sendResetPassMail = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.forgetPassword = catchAsync(async (req, res, next) => {
-  const {token, password} = req.body;
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  const { token, password } = req.body;
 
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
@@ -232,11 +232,11 @@ exports.forgetPassword = catchAsync(async (req, res, next) => {
   );
 
   if (!user) {
-    return res.status(404).json({ message: 'User not found' });
+    return res.status(404).json({ message: "User not found" });
   }
 
   res.status(200).json({
-    status: 'success',
-    message: 'Password reset successful'
-  })
+    status: "success",
+    message: "Password reset successful",
+  });
 });
