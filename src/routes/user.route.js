@@ -26,7 +26,7 @@ router.route('/clients')
   .get(getAllClients)
   .post(protect, createClient);
 
-router.route('/')
+router.route('/email/:id').get(getUserByEmail);
 
 router.route('/:id')
   .get(getUserById)
