@@ -46,14 +46,14 @@ const projectSchema = new mongoose.Schema({
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: "Client",
     required: true,
   },
   freelancerId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: 'Freelancer',
   },
-});
+}, { timestamps: true,});
 
 const Project = mongoose.model("Project", projectSchema);
 

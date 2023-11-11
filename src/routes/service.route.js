@@ -10,10 +10,11 @@ const {
   getBySubCategory
 } = require("./../controllers/service.controller");
 const { getByCategory } = require("../controllers/subCategory.controller");
+const { protect } = require("../controllers/auth.controller");
 
-router.route("/").get(getAllServices).post(createService);
+router.route("/").get(getAllServices).post(protect, createService);
 
-router.route("/:id").get(getService).delete(deleteService).patch(updateService);
+router.route("/:id").get(getService).delete(protect, deleteService).patch(protect, updateService);
 
 router.get("/get_by_path/:path", getServiceByPath);
 

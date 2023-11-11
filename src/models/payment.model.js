@@ -14,7 +14,8 @@ const paymentSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-  // Additional fields for payment status, payment method, etc.
+}, {
+  timestamps: true,
 });
 
 const Payment = mongoose.model('Payment', paymentSchema);

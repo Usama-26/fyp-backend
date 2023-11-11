@@ -9,14 +9,15 @@ const {
   getSubCategoryByPath,
   getByCategory,
 } = require("./../controllers/subCategory.controller");
+const { protect } = require("../controllers/auth.controller");
 
-router.route("/").get(getAllSubCategories).post(createSubCategory);
+router.route("/").get(getAllSubCategories).post(protect, createSubCategory);
 
 router
   .route("/:id")
   .get(getSubCategory)
-  .patch(updateSubCategory)
-  .delete(deleteSubCategory);
+  .patch(protect, updateSubCategory)
+  .delete(protect, deleteSubCategory);
 
 router.get("/get_by_path/:path", getSubCategoryByPath);
 

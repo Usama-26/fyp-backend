@@ -8,14 +8,15 @@ const {
   updateCategory,
   getCategoryByPath,
 } = require("./../controllers/category.controller");
+const { protect } = require("../controllers/auth.controller");
 
-router.route("/").post(createCategory).get(getAllCategories);
+router.route("/").post(protect, createCategory).get(getAllCategories);
 
 router
   .route("/:id")
   .get(getCategory)
-  .patch(updateCategory)
-  .delete(deleteCategory);
+  .patch(protect, updateCategory)
+  .delete(protect, deleteCategory);
 
 router.get("/get_by_path/:path", getCategoryByPath);
 

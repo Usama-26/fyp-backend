@@ -10,15 +10,15 @@ const {
   withGoogle
 } = require("./../controllers/auth.controller");
 
-router.post("/signup", signup);
+router.post("/signup", protect, signup);
 
-router.post("/login", login);
+router.post("/login", protect, login);
 
-router.get("/google", withGoogle);
+router.get("/google", protect, withGoogle);
 
-router.post("/forgetPassword", sendResetPassMail);
+router.post("/forgetPassword", protect, sendResetPassMail);
 
-router.post("/resetPassword", resetPassword);
+router.post("/resetPassword", protect, resetPassword);
 
 router.get("/getCurrentUser", protect, getCurrentUser);
 

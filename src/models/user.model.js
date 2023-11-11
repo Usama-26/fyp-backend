@@ -36,7 +36,7 @@ const userSchema = new Schema({
       message: "Entered email is invalid.",
     },
   },
-  email_verified: { type: Boolean },
+  email_verified: { type: Boolean, default: false },
   profile_photo: {
     type: String,
     validate: {
@@ -51,12 +51,77 @@ const userSchema = new Schema({
   },
   with_google: {
     type: Boolean,
+    default: false,
   },
   user_type: {
     type: String,
     enum: ["freelancer", "client"],
     required: true,
   },
+  address: {
+    type: String
+  },
+  country: {
+    type: String,
+  },
+  phone_number : {
+    type: String,
+  },
+  is_active: {
+    type: Boolean,
+    default: true,
+  },
+  online_status: {
+    type: String,
+    enum: ['online', 'offline', 'leave'],
+    default: 'online',
+  },
+  is_profile_completed: {
+    type: Boolean,
+  },
+  payment_method: {
+    vault_address: {
+      type: String,
+      trim: true,
+    },
+    vault_type: {
+      type: String,
+    },
+  },
+},{timestamps: true,});
+
+const userFreelancerSchema = userSchema.clone();
+userFreelancerSchema.add({
+  gigs: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Gigs',
+  }],
+  max_gigs: {
+    type: Number,
+    default: 5,
+  },
+  level: {
+    type: String,
+    enum: ['beginner', 'one', 'two', 'expert'],
+  },
+  skills: {
+    type: [String],
+  },
+});
+
+const userClientSchema = userSchema.clone();
+userClientSchema.add({
+  projects: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Projects',
+  }],
+  max_project_queue: {
+    type: Number,
+    default: 5,
+  },
+  payment_verified: {
+    type: Boolean,
+  }
 });
 
 userSchema.pre(["save"], async function (next) {
@@ -81,5 +146,12 @@ userSchema.methods.comparePassword = async function (unHashedPassword) {
 };
 
 const User = mongoose.model("User", userSchema);
+const FreelancerSchema = User.discriminator('FreelancerSchema', userFreelancerSchema);
+const ClientSchema = User.discriminator('ClientSchema', userClientSchema);
 
-module.exports = User;
+
+module.exports = {
+  User,
+  FreelancerSchema,
+  ClientSchema
+};

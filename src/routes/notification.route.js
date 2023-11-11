@@ -5,14 +5,15 @@ const {
   getAllNotificationsForUser,
   markNotificationAsRead
 } = require('../controllers/notification.controller');
+const { protect } = require("../controllers/auth.controller");
 
 // Create a new notification
-router.post('/notifications', createNotification);
+router.post('/notifications', protect, createNotification);
 
 // Get all notifications for a specific user
 router.get('/notifications/user/:userId', getAllNotificationsForUser);
 
 // Mark a notification as read
-router.patch('/notifications/:id', markNotificationAsRead);
+router.patch('/notifications/:id', protect, markNotificationAsRead);
 
 module.exports = router;

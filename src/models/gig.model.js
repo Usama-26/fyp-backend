@@ -130,6 +130,8 @@ const gigSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+}, {
+  timestamps: true,
 });
 
 const Gig = mongoose.model('Gig', gigSchema);
