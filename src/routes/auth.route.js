@@ -3,22 +3,22 @@ const router = express.Router();
 const {
   signup,
   login,
-  sendResetPassMail,
   protect,
   getCurrentUser,
   resetPassword,
-  withGoogle
+  withGoogle,
+  forgetPassword,
 } = require("./../controllers/auth.controller");
 
-router.post("/signup", protect, signup);
+router.post("/signup", signup);
 
-router.post("/login", protect, login);
+router.post("/login", login);
 
-router.get("/google", protect, withGoogle);
+router.get("/google", withGoogle);
 
-router.post("/forgetPassword", protect, sendResetPassMail);
+router.post("/forgetPassword", forgetPassword);
 
-router.post("/resetPassword", protect, resetPassword);
+router.post("/resetPassword", resetPassword);
 
 router.get("/getCurrentUser", protect, getCurrentUser);
 

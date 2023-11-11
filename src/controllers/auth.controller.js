@@ -29,11 +29,12 @@ exports.signup = catchAsync(async (req, res, next) => {
     if (user.with_google) {
       return next(
         new AppError(
-          "This user was previously joined by a different authentication method."
+          "This user was previously joined by a different authentication method.",
+          400
         )
       );
     } else {
-      return next(new AppError("This user already exists. Try login."));
+      return next(new AppError("This user already exists. Try login.", 400));
     }
   }
 
@@ -183,7 +184,7 @@ exports.getCurrentUser = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.sendResetPassMail = catchAsync(async (req, res, next) => {
+exports.forgetPassword = catchAsync(async (req, res, next) => {
   const { email } = req.body;
 
   const freelancer = await Freelancer.findOne({ email: email });
@@ -202,12 +203,14 @@ exports.sendResetPassMail = catchAsync(async (req, res, next) => {
   }
 
   // Generate a reset token
-  const resetToken = generateToken({ id: email , exp: Math.floor(Date.now() / 1000) + 3600 });
+  const resetToken = generateToken({
+    id: email,
+    exp: Math.floor(Date.now() / 1000) + 3600,
+  });
 
   // Construct the reset link
 
   const resetLink = `https://chainwork-frontend.vercel.app/auth/reset_password?token=${resetToken}`;
-
 
   // Create a transporter using SMTP settings
   const transporter = nodemailer.createTransport({
