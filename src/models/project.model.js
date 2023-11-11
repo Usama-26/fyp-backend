@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const projectSchema = new mongoose.Schema({
   title: {
@@ -14,21 +14,20 @@ const projectSchema = new mongoose.Schema({
     ref: "Category",
     required: true,
   },
-  subCategory: {
+  sub_category: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "subCategory",
+    ref: "SubCategory",
     required: true,
   },
   service: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Service",
-    required: true,
   },
   scope: {
     type: String,
     required: true,
   },
-  skillsLevel: {
+  skills_level: {
     type: String,
     required: true,
   },
@@ -40,22 +39,22 @@ const projectSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  pricingType: {
+  pricing_type: {
     type: String,
-    enum: ['hourly', 'fixed'],
+    enum: ["hourly", "fixed"],
     required: true,
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: "User",
     required: true,
   },
   freelancerId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-  }
+    ref: "User",
+  },
 });
 
-const Project = mongoose.model('Project', projectSchema);
+const Project = mongoose.model("Project", projectSchema);
 
 module.exports = Project;
