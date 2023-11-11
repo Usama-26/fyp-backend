@@ -95,13 +95,6 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
 
-  // 4) Check if user changed password after the token was issued
-  if (currentUser.changedPasswordAfter(decoded.iat)) {
-    return next(
-      new AppError("User recently changed password! Please log in again.", 401)
-    );
-  }
-
   // GRANT ACCESS TO PROTECTED ROUTE
   req.user = currentUser;
   res.locals.user = currentUser;
@@ -169,7 +162,9 @@ exports.sendResetPassMail = catchAsync(async (req, res, next) => {
   }
 
   if (user.with_google) {
-    return next(new AppError("User signed in with google. Can't reset password", 400));
+    return next(
+      new AppError("User signed in with google. Can't reset password", 400)
+    );
   }
 
   // Generate a reset token
@@ -203,7 +198,8 @@ exports.sendResetPassMail = catchAsync(async (req, res, next) => {
     } else {
       res.status(200).json({
         status: "success",
-        message: "Password reset link sent to " + email + " Kindly check your inbox.",
+        message:
+          "Password reset link sent to " + email + " Kindly check your inbox.",
       });
     }
   });

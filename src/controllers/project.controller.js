@@ -76,10 +76,25 @@ const deleteProject = catchAsync(async (req, res, next) => {
   });
 });
 
+const getClientProjects = catchAsync(async (req, res, next) => {
+  console.log(req.params.id);
+  const projects = await Project.find({ userId: req.params.id });
+
+  if (!projects) {
+    return next(new AppError("No Projects Found", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: projects,
+  });
+});
+
 module.exports = {
   createProject,
   getAllProjects,
   getProjectById,
   updateProject,
   deleteProject,
+  getClientProjects,
 };
