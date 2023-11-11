@@ -80,8 +80,6 @@ userSchema.methods.comparePassword = async function (unHashedPassword) {
   return bcrypt.compare(unHashedPassword, this.password);
 };
 
-
-
 const User = mongoose.model("User", userSchema);
 
 module.exports = User;

@@ -171,7 +171,7 @@ exports.sendResetPassMail = catchAsync(async (req, res, next) => {
   const resetToken = generateToken({ id: email });
 
   // Construct the reset link
-  const resetLink = `http://localhost:3000/auth/reset_password?token=${resetToken}`;
+  const resetLink = `http://chainwork-frontend.vercel.app/auth/reset_password?token=${resetToken}`;
 
   // Create a transporter using SMTP settings
   const transporter = nodemailer.createTransport({
