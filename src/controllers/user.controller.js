@@ -1,21 +1,59 @@
 const catchAsync = require("../utils/catchAsync");
 const User = require("../models/user.model");
+const AppError = require("../utils/appError");
+const { FreelancerSchema, ClientSchema } = require("../models/user.model");
+const Freelancer = require("../models/user.model").FreelancerSchema;
+const Client = require("../models/user.model").ClientSchema;
 
 // Get All Users
-const getAllUsers = catchAsync(async (req, res) => {
-  const users = await User.find();
+const getAllUsers = catchAsync(async (req, res, next) => {
+  const freelancerUsers = await Freelancer.find();
+  const clientUsers = await Client.find();
 
   res.status(200).json({
     status: "success",
-    length: users.length,
-    data: { users },
+    length: (freelancerUsers.length+clientUsers.length),
+    data: {
+      freelancerUser: freelancerUsers,
+      clientUsers: clientUsers
+    },
   });
 });
 
-// Get users by ID
-const getUserById = catchAsync(async (req, res) => {
+// Get All Freelancers
+const getAllFreelancers = catchAsync(async (req, res, next) => {
+  const freelancerUsers = await Freelancer.find();
+
+  res.status(200).json({
+    status: "success",
+    data: freelancerUsers,
+  });
+});
+
+// Get All Clients
+const getAllClients = catchAsync(async (req, res, next) => {
+  const clientUsers = await Client.find();
+
+  res.status(200).json({
+    status: "success",
+    data: clientUsers,
+  });
+});
+
+// Get users by ID (for both freelancers and clients)
+const getUserById = catchAsync(async (req, res, next) => {
   const userId = req.params.id;
-  const user = await User.findById(userId);
+  let user;
+
+  // Check if the user exists in the Freelancer or Client collection
+  const freelancerUser = await Freelancer.findById(userId);
+  const clientUser = await Client.findById(userId);
+
+  if (freelancerUser) {
+    user = freelancerUser;
+  } else if (clientUser) {
+    user = clientUser;
+  }
 
   res.status(200).json({
     status: "success",
@@ -23,32 +61,119 @@ const getUserById = catchAsync(async (req, res) => {
   });
 });
 
-// Create a new User
-const createUser = catchAsync(async (req, res) => {
-  const newUser = await User.create(req.body);
-  res.status(201).json({ status: "success", data: { newUser } });
+// Create a new Freelancer
+const createFreelancer = catchAsync(async (req, res, next) => {
+  const { email } = req.body;
+  const freelancer = await Freelancer.findOne({ email: email });
+
+  if (freelancer) {
+    return next(new AppError("Email already exists as a freelancer", 400));
+  }
+
+  const newFreelancer = await Freelancer.create(req.body);
+
+  res.status(201).json({
+    status: "success",
+    data: { newFreelancer },
+  });
 });
 
-// Update a user
-const updateUser = catchAsync(async (req, res) => {
-  const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+// Create a new Client
+const createClient = catchAsync(async (req, res, next) => {
+  const { email } = req.body;
+  const client = await Client.findOne({ email: email });
+
+  if (client) {
+    return next(new AppError("Email already exists as a client", 400));
+  }
+
+  const newClient = await Client.create(req.body);
+
+  res.status(201).json({
+    status: "success",
+    data: { newClient },
+  });
+});
+
+// Update a Freelancer
+const updateFreelancer = catchAsync(async (req, res, next) => {
+  const freelancerId = req.params.id;
+  const updatedFreelancer = await Freelancer.findByIdAndUpdate(
+    freelancerId,
+    req.body,
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  res.status(200).json({
+    status: "success",
+    data: updatedFreelancer,
+  });
+});
+
+// Update a Client
+const updateClient = catchAsync(async (req, res, next) => {
+  const clientId = req.params.id;
+  const updatedClient = await Client.findByIdAndUpdate(clientId, req.body, {
     new: true,
     runValidators: true,
   });
 
-  res.status(201).json({ status: "success", data: { user } });
+  res.status(200).json({
+    status: "success",
+    data: updatedClient,
+  });
 });
 
-// Delete a user
-const deleteUser = catchAsync(async (req, res) => {
-  await User.findByIdAndDelete(req.params.id);
+// Delete a Freelancer
+const deleteFreelancer = catchAsync(async (req, res, next) => {
+  const freelancerId = req.params.id;
+  await Freelancer.findByIdAndDelete(freelancerId);
+
   res.status(204).send();
+});
+
+// Delete a Client
+const deleteClient = catchAsync(async (req, res, next) => {
+  const clientId = req.params.id;
+  await Client.findByIdAndDelete(clientId);
+
+  res.status(204).send();
+});
+
+const getUserByEmail = catchAsync(async (req, res, next) => {
+  const { email } = req.body;
+
+  const freelancerUser = await FreelancerSchema.findOne({ email: email });
+  const clientUser = await ClientSchema.findOne({ email: email });
+
+  if (freelancerUser) {
+    res.status(200).json({
+      status: "success",
+      data: freelancerUser,
+    });
+  }else if (clientUser) {
+    res.status(200).json({
+      status: "success",
+      data: clientUser,
+    });
+  } else {
+    return next(new AppError("User not found", 404));
+  }
 });
 
 module.exports = {
   getAllUsers,
-  createUser,
-  updateUser,
-  deleteUser,
+  getAllFreelancers,
+  getAllClients,
+  getUserByEmail,
+  createFreelancer,
+  createClient,
+  updateFreelancer,
+  updateClient,
+  deleteFreelancer,
+  deleteClient,
   getUserById,
 };

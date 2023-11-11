@@ -2,7 +2,10 @@ const jwt = require("jsonwebtoken");
 const { promisify } = require("util");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
-const User = require("./../models/user.model");
+const User = require("../models/user.model");
+const Freelancer = require("../models/user.model").FreelancerSchema;
+const Client = require("../models/user.model").ClientSchema;
+
 const bcrypt = require("bcryptjs");
 const validator = require("validator");
 
@@ -17,7 +20,10 @@ function generateToken(payload) {
 
 exports.signup = catchAsync(async (req, res, next) => {
   const { email } = req.body;
-  const user = await User.findOne({ email: email });
+  const freelancer = await Freelancer.findOne({ email: email });
+  const client = await Client.findOne({ email: email });
+
+  const user = freelancer || client;
 
   if (user) {
     if (user.with_google) {
@@ -31,7 +37,14 @@ exports.signup = catchAsync(async (req, res, next) => {
     }
   }
 
-  const newUser = await User.create(req.body);
+  let newUser;
+
+  if (req.body.user_type === "freelancer") {
+    newUser = await Freelancer.create(req.body);
+  } else if (req.body.user_type === "client") {
+    newUser = await Client.create(req.body);
+  }
+
   const token = generateToken({ id: newUser._id, type: newUser.user_type });
 
   res.status(201).json({
@@ -43,10 +56,13 @@ exports.signup = catchAsync(async (req, res, next) => {
 
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
-  const user = await User.findOne({ email: email });
+  const freelancer = await Freelancer.findOne({ email: email });
+  const client = await Client.findOne({ email: email });
+
+  const user = freelancer || client;
 
   if (!user) {
-    return next(new AppError("Incorrect email or password.", 400));
+    return next(new AppError("User not found.", 400));
   }
 
   if (user.with_google) {
@@ -69,7 +85,7 @@ exports.login = catchAsync(async (req, res, next) => {
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
-  // 1) Getting token and check of it's there
+  // 1) Getting token and check if it's there
   let token;
   if (
     req.headers.authorization &&
@@ -85,20 +101,17 @@ exports.protect = catchAsync(async (req, res, next) => {
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
   // 3) Check if user still exists
-  const currentUser = await User.findById(decoded.id);
+  const freelancer = await Freelancer.findById(decoded.id);
+  const client = await Client.findById(decoded.id);
+
+  const currentUser = freelancer || client;
+
   if (!currentUser) {
     return next(
       new AppError(
         "The user belonging to this token does no longer exist.",
         401
       )
-    );
-  }
-
-  // 4) Check if user changed password after the token was issued
-  if (currentUser.changedPasswordAfter(decoded.iat)) {
-    return next(
-      new AppError("User recently changed password! Please log in again.", 401)
     );
   }
 
@@ -112,7 +125,11 @@ exports.withGoogle = catchAsync(async (req, res, next) => {
   const googleToken = req.headers["google-auth-token"];
   const userType = req.headers["user-type"];
   const decoded = jwt.decode(googleToken);
-  const user = await User.findOne({ email: decoded.email });
+
+  const freelancer = await Freelancer.findOne({ email: decoded.email });
+  const client = await Client.findOne({ email: decoded.email });
+
+  const user = freelancer || client;
 
   let token;
 
@@ -142,7 +159,14 @@ exports.withGoogle = catchAsync(async (req, res, next) => {
     user_type: userType,
   };
 
-  const newUser = await User.create(userData);
+  let newUser;
+
+  if (userData.user_type === "freelancer") {
+    newUser = await Freelancer.create(userData);
+  } else if (userData.user_type === "client") {
+    newUser = await Client.create(userData);
+  }
+
   token = generateToken({ id: newUser._id, type: newUser.user_type });
 
   res.status(201).json({
@@ -162,10 +186,13 @@ exports.getCurrentUser = catchAsync(async (req, res, next) => {
 exports.sendResetPassMail = catchAsync(async (req, res, next) => {
   const { email } = req.body;
 
-  const user = await User.findOne({ email: email });
+  const freelancer = await Freelancer.findOne({ email: email });
+  const client = await Client.findOne({ email: email });
+
+  const user = freelancer || client;
 
   if (!user) {
-    return next(new AppError("Email not found", 400));
+    return next(new AppError("Email not found.", 400));
   }
 
   if (user.with_google) {
@@ -173,10 +200,10 @@ exports.sendResetPassMail = catchAsync(async (req, res, next) => {
   }
 
   // Generate a reset token
-  const resetToken = generateToken({ id: email });
+  const resetToken = generateToken({ id: email , exp: Math.floor(Date.now() / 1000) + 3600 });
 
   // Construct the reset link
-  const resetLink = `http://localhost:3000/auth/reset_password?token=${resetToken}`;
+  const resetLink = `https://chainwork-frontend.vercel.app/auth/reset_password?token=${resetToken}`;
 
   // Create a transporter using SMTP settings
   const transporter = nodemailer.createTransport({
@@ -203,7 +230,7 @@ exports.sendResetPassMail = catchAsync(async (req, res, next) => {
     } else {
       res.status(200).json({
         status: "success",
-        message: "Password reset link sent to " + email + " Kindly check your inbox.",
+        message: "Password reset link sent to " + email + " Kindly check your inbox. Link expires in 1 hour.",
       });
     }
   });
@@ -228,11 +255,18 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   const hashedPassword = await bcrypt.hash(password, 12);
 
-  const user = await User.findOneAndUpdate(
+  const freelancer = await Freelancer.findOneAndUpdate(
     { email: email },
     { password: hashedPassword },
     { new: true }
   );
+  const client = await Client.findOneAndUpdate(
+    { email: email },
+    { password: hashedPassword },
+    { new: true }
+  );
+
+  const user = freelancer || client;
 
   if (!user) {
     return res.status(404).json({ message: "User not found" });

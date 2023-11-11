@@ -4,7 +4,12 @@ const catchAsync = require('../utils/catchAsync');
 
 // Create a new Gig
 const createGig = catchAsync(async (req, res, next) => {
+  if (req.user.gigs.length <= req.user.max_gigs) {
+    return next(new AppError('Gigs slots filled. Buy more gig slots.', 404));
+  }
+
   const gig = await Gig.create(req.body);
+
   res.status(201).json({
     status: 'success',
     data: gig,

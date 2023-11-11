@@ -19,7 +19,8 @@ const proposalSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  // Additional fields for proposal status, submission date, etc.
+}, {
+  timestamps: true,
 });
 
 const Proposal = mongoose.model('Proposal', proposalSchema);
