@@ -196,14 +196,18 @@ exports.sendResetPassMail = catchAsync(async (req, res, next) => {
   }
 
   if (user.with_google) {
-    return next(new AppError("User signed in with google. Can't reset password", 400));
+    return next(
+      new AppError("User signed in with google. Can't reset password", 400)
+    );
   }
 
   // Generate a reset token
   const resetToken = generateToken({ id: email , exp: Math.floor(Date.now() / 1000) + 3600 });
 
   // Construct the reset link
+
   const resetLink = `https://chainwork-frontend.vercel.app/auth/reset_password?token=${resetToken}`;
+
 
   // Create a transporter using SMTP settings
   const transporter = nodemailer.createTransport({
@@ -230,7 +234,8 @@ exports.sendResetPassMail = catchAsync(async (req, res, next) => {
     } else {
       res.status(200).json({
         status: "success",
-        message: "Password reset link sent to " + email + " Kindly check your inbox. Link expires in 1 hour.",
+        message:
+          "Password reset link sent to " + email + " Kindly check your inbox.",
       });
     }
   });
