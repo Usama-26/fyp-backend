@@ -32,7 +32,7 @@ app.use("/api/v1/services", serviceRouter);
 app.use("/api/v1/reviews", reviewRouter);
 app.use("/api/v1/projects", projectRouter);
 app.use("/api/v1/auth", authRouter);
-app.use("/api/v1/proposal", proposalRouter);
+app.use("/api/v1/proposals", proposalRouter);
 app.use("/api/v1/gigs", gigRouter);
 
 app.get("/", (req, res) => {

@@ -1,13 +1,12 @@
-const catchAsync = require('../utils/catchAsync');
-const Proposal = require('../models/proposal.model');
+const catchAsync = require("../utils/catchAsync");
+const Proposal = require("../models/proposal.model");
 
 // Create a new proposal
 const createProposal = catchAsync(async (req, res) => {
-  const proposalData = req.body;
-  const proposal = await Proposal.create(proposalData);
+  const proposal = await Proposal.create(req.body);
 
   res.status(201).json({
-    status: 'success',
+    status: "success",
     data: proposal,
   });
 });
@@ -18,7 +17,7 @@ const getAllProposalsForProject = catchAsync(async (req, res) => {
   const proposals = await Proposal.find({ projectId });
 
   res.status(200).json({
-    status: 'success',
+    status: "success",
     length: proposals.length,
     data: { proposals },
   });
@@ -31,13 +30,13 @@ const getProposalById = catchAsync(async (req, res) => {
 
   if (!proposal) {
     return res.status(404).json({
-      status: 'fail',
-      message: 'Proposal not found',
+      status: "fail",
+      message: "Proposal not found",
     });
   }
 
   res.status(200).json({
-    status: 'success',
+    status: "success",
     data: proposal,
   });
 });

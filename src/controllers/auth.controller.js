@@ -2,7 +2,6 @@ const jwt = require("jsonwebtoken");
 const { promisify } = require("util");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
-const User = require("../models/user.model");
 const Freelancer = require("../models/user.model").FreelancerSchema;
 const Client = require("../models/user.model").ClientSchema;
 
@@ -187,8 +186,12 @@ exports.getCurrentUser = catchAsync(async (req, res, next) => {
 exports.forgetPassword = catchAsync(async (req, res, next) => {
   const { email } = req.body;
 
-  const freelancer = await Freelancer.findOne({ email: email });
-  const client = await Client.findOne({ email: email });
+  const freelancer = await Freelancer.findOne({ email: email }).populate(
+    "projects"
+  );
+  const client = await Client.findOne({ email: email }).populate(
+    "gigs proposals"
+  );
 
   const user = freelancer || client;
 
