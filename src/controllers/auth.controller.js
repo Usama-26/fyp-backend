@@ -134,7 +134,6 @@ exports.withGoogle = catchAsync(async (req, res, next) => {
   let token;
 
   if (user) {
-    console.log("111", user);
     if (user.with_google) {
       token = generateToken({ id: user._id, type: user.user_type });
 
