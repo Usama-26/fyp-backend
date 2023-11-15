@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
 const {
@@ -6,18 +6,19 @@ const {
   getAllSkills,
   getSkillById,
   deleteSkill,
-  updateSkill
-} = require('../controllers/skill.controller');
+  updateSkill,
+} = require("../controllers/skill.controller");
+
 const { protect } = require("../controllers/auth.controller");
 
-router.post('/skills', protect, createSkill);
+router.post("/", protect, createSkill);
 
-router.get('/skills', getAllSkills);
+router.get("/", getAllSkills);
 
-router.get('/skills/:id', getSkillById);
+router.get("/:id", getSkillById);
 
-router.put('/skills/:id', protect, updateSkill);
+router.patch("/:id", protect, updateSkill);
 
-router.delete('/skills/:id', protect, deleteSkill);
+router.delete("/:id", protect, deleteSkill);
 
 module.exports = router;

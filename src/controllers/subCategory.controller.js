@@ -45,7 +45,11 @@ const deleteSubCategory = catchAsync(async (req, res, next) => {
 });
 
 const updateSubCategory = catchAsync(async (req, res, next) => {
-  const subCategory = await SubCategory.findByIdAndUpdate(req.params.id);
+  const subCategory = await SubCategory.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { new: true, runValidators: true }
+  );
 
   res.status(200).json({
     status: "success",

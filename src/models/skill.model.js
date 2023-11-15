@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { default: slugify } = require("slugify");
 const Schema = mongoose.Schema;
 
 const skillSchema = new Schema(
@@ -8,6 +9,9 @@ const skillSchema = new Schema(
       required: [true, "Name not provided."],
       unique: [true, "Skill with this name already exists."],
       trim: true,
+    },
+    slug: {
+      type: String,
     },
     description: {
       type: String,
@@ -25,5 +29,13 @@ const skillSchema = new Schema(
 );
 
 const Skill = mongoose.model("Skill", skillSchema);
+
+skillSchema.pre("save", function (next) {
+  this.slug = slugify(this.name.toLowerCase(), {
+    replacement: "-",
+    lower: true,
+  });
+  next();
+});
 
 module.exports = Skill;

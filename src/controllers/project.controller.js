@@ -4,8 +4,9 @@ const AppError = require("../utils/appError");
 
 // Create a new project
 const createProject = catchAsync(async (req, res, next) => {
-  const project = await Project.create({ userId: req.user._id, ...req.body });
-
+  console.log("Sent Data", { user_id: req.user._id, ...req.body });
+  const project = await Project.create({ user_id: req.user._id, ...req.body });
+  console.log("Saved Project:", project);
   res.status(201).json({
     status: "success",
     data: project,

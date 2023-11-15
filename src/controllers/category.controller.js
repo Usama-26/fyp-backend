@@ -48,7 +48,9 @@ const deleteCategory = catchAsync(async (req, res, next) => {
 });
 
 const updateCategory = catchAsync(async (req, res, next) => {
-  const category = await Category.findByIdAndUpdate(req.params.id);
+  const category = await Category.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+  });
 
   res.status(200).json({
     status: "success",

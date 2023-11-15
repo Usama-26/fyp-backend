@@ -52,7 +52,7 @@ const projectSchema = new mongoose.Schema(
       enum: ["hourly", "fixed"],
       required: true,
     },
-    userId: {
+    created_by: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Client",
       required: true,

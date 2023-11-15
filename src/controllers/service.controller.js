@@ -40,7 +40,9 @@ const deleteService = catchAsync(async (req, res, next) => {
 });
 
 const updateService = catchAsync(async (req, res, next) => {
-  const service = await Service.findByIdAndUpdate(req.params.id);
+  const service = await Service.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+  });
 
   res.status(200).json({
     status: "success",
@@ -79,5 +81,5 @@ module.exports = {
   deleteService,
   updateService,
   getServiceByPath,
-  getBySubCategory
+  getBySubCategory,
 };
