@@ -8,12 +8,16 @@ const {
   getProjectById,
   updateProject,
   deleteProject,
-  getClientProjects
+  getClientProjects,
 } = require("./../controllers/project.controller");
+const upload = require("../middlewares/multerStorage");
 
-router.route("/").post(protect, createProject).get(getAllProjects);
+router
+  .route("/")
+  .post(protect, upload.array("attachments"), createProject)
+  .get(getAllProjects);
 
-router.get("/get_client_projects/:id", protect, getClientProjects );
+router.get("/get_client_projects/:id", protect, getClientProjects);
 
 router
   .route("/:id")
