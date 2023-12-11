@@ -7,8 +7,7 @@ const getAllCategories = catchAsync(async (req, res, next) => {
     .select("path name")
     .populate({
       path: "sub_categories",
-      select: "path name",
-      populate: { path: "services", select: "path name" },
+      populate: { path: "services" },
     });
 
   res.status(200).json({

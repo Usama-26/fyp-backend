@@ -1,7 +1,9 @@
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
+const dotenv = require("dotenv");
 const helmet = require("helmet");
+const cloudinary = require("cloudinary").v2;
 
 const globalErrorHandler = require("./controllers/error.controller");
 const userRouter = require("./routes/user.route");
@@ -16,7 +18,15 @@ const gigRouter = require("./routes/gig.route");
 const skillRouter = require("./routes/skill.route");
 const AppError = require("./utils/appError");
 
+dotenv.config({ path: `${__dirname}/../config.env` });
+
 const app = express();
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 app.use(express.json());
 app.use(morgan("dev"));

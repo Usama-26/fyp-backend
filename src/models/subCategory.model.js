@@ -26,6 +26,7 @@ const subCategorySchema = new Schema(
         ref: "Service",
       },
     ],
+    tags: { type: [String] },
     reviews: [
       {
         review: {
@@ -59,7 +60,7 @@ subCategorySchema.pre("save", function (next) {
   next();
 });
 
-subCategorySchema.pre("findOneAndDelete", async function (next) {
+subCategorySchema.pre(["findOneAndDelete"], async function (next) {
   try {
     const category = await Category.updateOne(
       { _id: this.category },

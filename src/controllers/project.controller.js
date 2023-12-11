@@ -4,9 +4,11 @@ const AppError = require("../utils/appError");
 
 // Create a new project
 const createProject = catchAsync(async (req, res, next) => {
-  console.log("Sent Data", { user_id: req.user._id, ...req.body });
-  const project = await Project.create({ user_id: req.user._id, ...req.body });
-  console.log("Saved Project:", project);
+  const project = await Project.create({
+    created_by: req.user._id,
+    ...req.body,
+  });
+
   res.status(201).json({
     status: "success",
     data: project,
@@ -78,8 +80,7 @@ const deleteProject = catchAsync(async (req, res, next) => {
 });
 
 const getClientProjects = catchAsync(async (req, res, next) => {
-  console.log(req.params.id);
-  const projects = await Project.find({ userId: req.params.id });
+  const projects = await Project.find({ created_by: req.params.id });
 
   if (!projects) {
     return next(new AppError("No Projects Found", 404));

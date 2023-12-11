@@ -25,18 +25,14 @@ const projectSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Service",
     },
-    scope: {
-      type: String,
-      required: true,
-    },
     status: {
       type: String,
       required: true,
       enum: ["awarded", "listed"],
       default: "listed",
     },
-    skills_level: {
-      type: String,
+    tags: {
+      type: [String],
       required: true,
     },
     budget: {
@@ -61,6 +57,9 @@ const projectSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Freelancer",
     },
+    attachments: {
+      type: String,
+    },
     proposals: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -74,7 +73,7 @@ const projectSchema = new mongoose.Schema(
 projectSchema.pre("findOneAndDelete", async function (next) {
   try {
     const client = await ClientSchema.updateOne(
-      { _id: this.userId },
+      { _id: this.created_by },
       { $pull: { projects: this._id } },
       { new: true }
     );
@@ -90,7 +89,7 @@ projectSchema.pre("findOneAndDelete", async function (next) {
 projectSchema.post("save", async function (doc, next) {
   try {
     const client = await ClientSchema.updateOne(
-      { _id: this.userId },
+      { _id: this.created_by },
       { $push: { projects: this._id } },
       { new: true }
     );

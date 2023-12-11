@@ -37,6 +37,9 @@ const userSchema = new Schema(
         message: "Entered email is invalid.",
       },
     },
+    bio: {
+      type: String,
+    },
     email_verified: { type: Boolean, default: false },
     profile_photo: {
       type: String,
@@ -90,7 +93,7 @@ const userSchema = new Schema(
       },
     },
   },
-  { timestamps: true }
+  { toJSON: { virtuals: true }, timestamps: true }
 );
 
 const userFreelancerSchema = userSchema.clone();
@@ -128,6 +131,22 @@ userClientSchema.add({
       ref: "Projects",
     },
   ],
+  client_scope: {
+    type: String,
+    enum: ["individual", "company"],
+  },
+  industry: {
+    type: String,
+  },
+  company_name: {
+    type: String,
+  },
+  company_website_link: {
+    type: String,
+  },
+  preferred_skills: {
+    type: [String],
+  },
   max_project_queue: {
     type: Number,
     default: 5,

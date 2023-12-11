@@ -2,6 +2,7 @@ const catchAsync = require("../utils/catchAsync");
 const User = require("../models/user.model");
 const AppError = require("../utils/appError");
 const { FreelancerSchema, ClientSchema } = require("../models/user.model");
+const cloudinaryUpload = require("../utils/cloudinaryUpload");
 const Freelancer = require("../models/user.model").FreelancerSchema;
 const Client = require("../models/user.model").ClientSchema;
 
@@ -12,10 +13,10 @@ const getAllUsers = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: "success",
-    length: (freelancerUsers.length+clientUsers.length),
+    length: freelancerUsers.length + clientUsers.length,
     data: {
       freelancerUser: freelancerUsers,
-      clientUsers: clientUsers
+      clientUsers: clientUsers,
     },
   });
 });
@@ -57,7 +58,7 @@ const getUserById = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: "success",
-    data: { user },
+    data: user,
   });
 });
 
@@ -154,7 +155,7 @@ const getUserByEmail = catchAsync(async (req, res, next) => {
       status: "success",
       data: freelancerUser,
     });
-  }else if (clientUser) {
+  } else if (clientUser) {
     res.status(200).json({
       status: "success",
       data: clientUser,
@@ -162,6 +163,37 @@ const getUserByEmail = catchAsync(async (req, res, next) => {
   } else {
     return next(new AppError("User not found", 404));
   }
+});
+
+const updateProfilePhoto = catchAsync(async (req, res, next) => {
+  const { user } = req;
+  const b64 = Buffer.from(req.file.buffer).toString("base64");
+  let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
+  const cloudinaryRes = await cloudinaryUpload(dataURI);
+
+  let updatedClient;
+  let updatedFreelancer;
+
+  if (cloudinaryRes) {
+    const data = { profile_photo: cloudinaryRes.secure_url };
+    if (user.user_type === "client") {
+      updatedClient = await Client.findByIdAndUpdate(user._id, data, {
+        new: true,
+        runValidators: true,
+      });
+    }
+
+    if (user.user_type === "freelancer") {
+      updatedFreelancer = await Freelancer.findByIdAndUpdate(user._id, data, {
+        new: true,
+        runValidators: true,
+      });
+    }
+  }
+
+  res
+    .status(200)
+    .json({ status: "success", data: updatedClient || updatedFreelancer });
 });
 
 module.exports = {
@@ -176,4 +208,6 @@ module.exports = {
   deleteFreelancer,
   deleteClient,
   getUserById,
+
+  updateProfilePhoto,
 };
