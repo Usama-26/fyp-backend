@@ -92,6 +92,9 @@ const userSchema = new Schema(
         type: String,
       },
     },
+    payment_verified: {
+      type: Boolean,
+    },
   },
   { toJSON: { virtuals: true }, timestamps: true }
 );
@@ -134,6 +137,7 @@ userClientSchema.add({
   client_scope: {
     type: String,
     enum: ["individual", "company"],
+    default: 'individual'
   },
   industry: {
     type: String,
@@ -151,10 +155,41 @@ userClientSchema.add({
     type: Number,
     default: 5,
   },
-  payment_verified: {
-    type: Boolean,
-  },
 });
+
+// virtual property for profile completion percentage
+userSchema.virtual('profile_completion').get(function () {
+  // Define the required fields for each user type
+  const requiredFields = {
+    freelancer: ['profile_photo', 'email_verified','address', 'phone_number', 'skills', 'payment_verified'],
+    client: [ 'profile_photo', 'email_verified', 'address', 'phone_number', 'payment_verified'],
+  };
+
+  // Determine the user type based on the presence of certain fields
+  const userType = this.skills ? 'freelancer' : (this.client_scope ? 'client' : 'undefined');
+
+  // If the user type is undefined, return 0% completion
+  if (userType === 'undefined') {
+    return 0;
+  }
+
+  // Calculate completion based on the required fields for the user type
+  const totalWeight = requiredFields[userType].length * 20; // Assuming each field has a weight of 20
+  const filledWeight = requiredFields[userType].reduce((total, field) => {
+    if (this[field]) {
+      return total + 20; // Adjust weight as needed
+    }
+    return total;
+  }, 0);
+
+  // Calculate the percentage
+  const percentage = (filledWeight / totalWeight) * 100;
+
+  return Math.round(percentage);
+});
+
+// Make the virtual property appear in the JSON representation of the model
+userSchema.set('toJSON', { virtuals: true });
 
 userSchema.pre(["save"], async function (next) {
   const passwordPattern = /^(?=.*[a-zA-Z])(?=.*\d)(?!.*\s).+$/;
