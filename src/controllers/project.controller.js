@@ -1,32 +1,14 @@
 const catchAsync = require("../utils/catchAsync");
 const Project = require("./../models/project.model");
 const AppError = require("../utils/appError");
+const cloudinaryUpload = require("../utils/cloudinaryUpload");
+const upload = require("../middlewares/multerStorage");
 
 // Create a new project
 const createProject = catchAsync(async (req, res, next) => {
-  const { files } = req;
-
-  let cloudinaryResponses;
-
-  if (files) {
-    cloudinaryResponses = await Promise.all(
-      files.map(async (file) => {
-        const b64 = Buffer.from(file.buffer).toString("base64");
-        const dataURI = "data:" + file.mimetype + ";base64," + b64;
-        try {
-          const cloudinaryRes = await cloudinaryUpload(dataURI);
-          return cloudinaryRes.secure_url;
-        } catch (error) {
-          return error.message;
-        }
-      })
-    );
-  }
-
   const project = await Project.create({
     created_by: req.user._id,
     ...req.body,
-    attachments: cloudinaryResponses.length > 0 ? cloudinaryResponses : "",
   });
 
   res.status(201).json({

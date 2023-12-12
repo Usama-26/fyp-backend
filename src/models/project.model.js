@@ -58,7 +58,7 @@ const projectSchema = new mongoose.Schema(
       ref: "Freelancer",
     },
     attachments: {
-      type: String,
+      type: [String],
     },
     proposals: [
       {

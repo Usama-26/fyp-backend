@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { protect } = require("../controllers/auth.controller");
-
+const upload = require("../middlewares/multerStorage");
 const {
   createProject,
   getAllProjects,
@@ -10,12 +10,8 @@ const {
   deleteProject,
   getClientProjects,
 } = require("./../controllers/project.controller");
-const upload = require("../middlewares/multerStorage");
 
-router
-  .route("/")
-  .post(protect, upload.array("attachments"), createProject)
-  .get(getAllProjects);
+router.route("/").post(protect, createProject).get(getAllProjects);
 
 router.get("/get_client_projects/:id", protect, getClientProjects);
 
@@ -23,6 +19,6 @@ router
   .route("/:id")
   .get(getProjectById)
   .delete(protect, deleteProject)
-  .patch(protect, updateProject);
+  .patch(protect, upload.array("attachments"), updateProject);
 
 module.exports = router;
