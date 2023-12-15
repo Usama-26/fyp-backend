@@ -234,7 +234,7 @@ exports.sendResetPassMail = catchAsync(async (req, res, next) => {
 
   const resetToken = generateToken({ id: email });
 
-  const resetLink = `https://chainwork-frontend.vercel.app/auth/reset_password?token=${resetToken}`;
+  const resetLink = `http://localhost:3000/auth/reset_password?token=${resetToken}`;
 
   const transporter = nodemailer.createTransport({
     host: "smtp-relay.brevo.com",
@@ -247,7 +247,7 @@ exports.sendResetPassMail = catchAsync(async (req, res, next) => {
   });
 
   const mailOptions = {
-    from: "support@chainwork.com",
+    from: "ChainWork Support <support@chainwork.com>",
     to: email,
     subject: "Password Reset Request",
     text: "You made password reset request.",
@@ -376,12 +376,8 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 });
 
 exports.verifyEmail = catchAsync(async (req, res, next) => {
-  const { token } = req.params;
-
-  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-
-  const freelancer = await Freelancer.findById(decoded.id);
-  const client = await Client.findById(decoded.id);
+  const freelancer = await Freelancer.findById(req.user.id);
+  const client = await Client.findById(req.user.id);
 
   const user = freelancer || client;
 
@@ -394,6 +390,6 @@ exports.verifyEmail = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: "success",
-    message: "Email verification successful. You can now log in.",
+    message: "Email verification successful. ",
   });
 });

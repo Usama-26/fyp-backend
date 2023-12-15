@@ -3,6 +3,7 @@ const Project = require("./../models/project.model");
 const AppError = require("../utils/appError");
 const cloudinaryUpload = require("../utils/cloudinaryUpload");
 const upload = require("../middlewares/multerStorage");
+const APIFeatures = require("../utils/apiFeatures");
 
 // Create a new project
 const createProject = catchAsync(async (req, res, next) => {
@@ -19,7 +20,9 @@ const createProject = catchAsync(async (req, res, next) => {
 
 // Get all projects
 const getAllProjects = catchAsync(async (req, res, next) => {
-  const projects = await Project.find();
+  const features = new APIFeatures(Project.find(), req.query).filter();
+
+  const projects = await features.query;
 
   res.status(200).json({
     status: "success",
@@ -31,7 +34,10 @@ const getAllProjects = catchAsync(async (req, res, next) => {
 // Get a project by its ID
 const getProjectById = catchAsync(async (req, res, next) => {
   const projectId = req.params.id;
-  const project = await Project.findById(projectId);
+  const project = await Project.findById(projectId).populate({
+    path: "proposals",
+    select: "freelancer_id",
+  });
 
   if (!project) {
     return next(new AppError("Project not found", 404));

@@ -24,7 +24,7 @@ router.post("/resetPassword", resetPassword);
 
 router.patch("/updatePassword/:id", protect, updatePassword);
 
-router.post("/verify_email", verifyEmail);
+router.post("/verify_email", protect, verifyEmail);
 
 router.get("/getCurrentUser", protect, getCurrentUser);
 

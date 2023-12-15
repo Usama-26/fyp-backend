@@ -137,7 +137,7 @@ userClientSchema.add({
   client_scope: {
     type: String,
     enum: ["individual", "company"],
-    default: 'individual'
+    default: "individual",
   },
   industry: {
     type: String,
@@ -158,18 +158,28 @@ userClientSchema.add({
 });
 
 // virtual property for profile completion percentage
-userSchema.virtual('profile_completion').get(function () {
+userSchema.virtual("profile_completion").get(function () {
   // Define the required fields for each user type
   const requiredFields = {
-    freelancer: ['profile_photo', 'email_verified','address', 'phone_number', 'skills', 'payment_verified'],
-    client: [ 'profile_photo', 'email_verified', 'address', 'phone_number', 'payment_verified'],
+    freelancer: [
+      "profile_photo",
+      "email_verified",
+      "address",
+      "skills",
+      "payment_verified",
+    ],
+    client: ["profile_photo", "email_verified", "address", "payment_verified"],
   };
 
   // Determine the user type based on the presence of certain fields
-  const userType = this.skills ? 'freelancer' : (this.client_scope ? 'client' : 'undefined');
+  const userType = this.skills
+    ? "freelancer"
+    : this.client_scope
+    ? "client"
+    : "undefined";
 
   // If the user type is undefined, return 0% completion
-  if (userType === 'undefined') {
+  if (userType === "undefined") {
     return 0;
   }
 
@@ -189,7 +199,7 @@ userSchema.virtual('profile_completion').get(function () {
 });
 
 // Make the virtual property appear in the JSON representation of the model
-userSchema.set('toJSON', { virtuals: true });
+userSchema.set("toJSON", { virtuals: true });
 
 userSchema.pre(["save"], async function (next) {
   const passwordPattern = /^(?=.*[a-zA-Z])(?=.*\d)(?!.*\s).+$/;
