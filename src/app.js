@@ -16,6 +16,7 @@ const projectRouter = require("./routes/project.route");
 const proposalRouter = require("./routes/proposal.route");
 const gigRouter = require("./routes/gig.route");
 const skillRouter = require("./routes/skill.route");
+const languageRouter = require("./routes/language.route");
 const AppError = require("./utils/appError");
 
 dotenv.config({ path: `${__dirname}/../config.env` });
@@ -46,6 +47,7 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/proposals", proposalRouter);
 app.use("/api/v1/gigs", gigRouter);
 app.use("/api/v1/skills", skillRouter);
+app.use("/api/v1/languages", languageRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello from the server. 👋");

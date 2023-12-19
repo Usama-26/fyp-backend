@@ -11,7 +11,10 @@ const {
   getClientProjects,
 } = require("./../controllers/project.controller");
 
-router.route("/").post(protect, createProject).get(getAllProjects);
+router
+  .route("/")
+  .post(protect, upload.array("attachments"), createProject)
+  .get(getAllProjects);
 
 router.get("/get_client_projects/:id", protect, getClientProjects);
 

@@ -36,7 +36,11 @@ const getProjectById = catchAsync(async (req, res, next) => {
   const projectId = req.params.id;
   const project = await Project.findById(projectId).populate({
     path: "proposals",
-    select: "freelancer_id",
+    populate: {
+      path: "freelancer_id",
+      select: "firstName lastName profile_photo",
+      model: "FreelancerSchema",
+    },
   });
 
   if (!project) {

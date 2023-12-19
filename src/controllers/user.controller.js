@@ -167,7 +167,6 @@ const getUserByEmail = catchAsync(async (req, res, next) => {
 
 const updateProfilePhoto = catchAsync(async (req, res, next) => {
   const { user } = req;
-  console.log(req.body);
   const b64 = Buffer.from(req.file.buffer).toString("base64");
   let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
   const cloudinaryRes = await cloudinaryUpload(dataURI);
