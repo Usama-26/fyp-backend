@@ -10,6 +10,7 @@ const {
   updatePassword,
   withGoogle,
   verifyEmail,
+  emailVerification
 } = require("./../controllers/auth.controller");
 
 router.post("/signup", signup);
@@ -27,5 +28,7 @@ router.patch("/updatePassword/:id", protect, updatePassword);
 router.post("/verify_email", protect, verifyEmail);
 
 router.get("/getCurrentUser", protect, getCurrentUser);
+
+router.get("/sendEmail", protect, emailVerification);
 
 module.exports = router;
