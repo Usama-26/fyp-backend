@@ -393,3 +393,43 @@ exports.verifyEmail = catchAsync(async (req, res, next) => {
     message: "Email verification successful. ",
   });
 });
+
+exports.emailVerification = catchAsync(async (req, res, next) => {
+  const token = generateToken({ id: req.user._id, type: req.user.user_type });
+
+  const verificationLink = `https://fyp-backend.up.railway.app/api/v1/auth/verify_email?token=${token}`;
+
+  const transporter = nodemailer.createTransport({
+    host: "smtp-relay.brevo.com",
+    port: 587,
+    secure: false,
+    auth: {
+      user: "taimoorahamed95959@gmail.com",
+      pass: "5HUmBnIY7jO38dys",
+    },
+  });
+
+  const mailOptions = {
+    from: "support@chainwork.com",
+    to: req.user.email,
+    subject: "Welcome to ChainWork",
+    text: "Please verify your email to continue exploring all the features of ChainWork.",
+    html: `<p>To verfiy your email, please click on the following link: <a href="${verificationLink}">here</a></p>`,
+  };
+
+  await transporter.sendMail(mailOptions, function(error, info) {
+    if (error) {
+      return next(new AppError(`Error sending email: ${error}}`, 400));
+    } else {
+    }
+  });
+  res.status(200).json({
+    status: "success",
+    token,
+    data: req.user,
+    message:
+      "Email verification link sent to " +
+      req.user +
+      " Kindly check your inbox. Link expires in 1 hour.",
+  });
+});
