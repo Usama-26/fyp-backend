@@ -5,8 +5,17 @@ const SubCategory = require("./../models/subCategory.model");
 
 const getAllSubCategories = catchAsync(async (req, res, next) => {
   const subCategories = await SubCategory.find()
-    .select("path name")
-    .populate({ path: "services", select: "path name" });
+    .select("path name category")
+    .populate([
+      {
+        path: "services",
+        select: "path name",
+      },
+      {
+        path: "category",
+        select: "name",
+      },
+    ]);
 
   res.status(200).json({
     status: "success",
