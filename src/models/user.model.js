@@ -126,6 +126,12 @@ userFreelancerSchema.add({
   skills: {
     type: [String],
   },
+  projects: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Projects",
+    },
+  ],
 });
 
 const userClientSchema = userSchema.clone();

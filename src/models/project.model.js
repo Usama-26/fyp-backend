@@ -53,7 +53,7 @@ const projectSchema = new mongoose.Schema(
       ref: "Client",
       required: true,
     },
-    freelancer_id: {
+    assigned_to: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Freelancer",
     },

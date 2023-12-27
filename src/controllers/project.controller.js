@@ -57,14 +57,21 @@ const getAllProjects = catchAsync(async (req, res, next) => {
 // Get a project by its ID
 const getProjectById = catchAsync(async (req, res, next) => {
   const projectId = req.params.id;
-  const project = await Project.findById(projectId).populate({
-    path: "proposals",
-    populate: {
-      path: "freelancer_id",
+  const project = await Project.findById(projectId).populate([
+    {
+      path: "proposals",
+      populate: {
+        path: "freelancer_id",
+        select: "firstName lastName profile_photo",
+        model: "FreelancerSchema",
+      },
+    },
+    {
+      path: "assigned_to",
       select: "firstName lastName profile_photo",
       model: "FreelancerSchema",
     },
-  });
+  ]);
 
   if (!project) {
     return next(new AppError("Project not found", 404));
