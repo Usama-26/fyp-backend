@@ -397,7 +397,7 @@ exports.verifyEmail = catchAsync(async (req, res, next) => {
 exports.emailVerification = catchAsync(async (req, res, next) => {
   const token = generateToken({ id: req.user._id, type: req.user.user_type });
 
-  const verificationLink = `https://fyp-backend.up.railway.app/api/v1/auth/verify_email?token=${token}`;
+  const verificationLink = `http://localhost:8000/api/v1/auth/verify_email?token=${token}`;
 
   const transporter = nodemailer.createTransport({
     host: "smtp-relay.brevo.com",
@@ -417,7 +417,7 @@ exports.emailVerification = catchAsync(async (req, res, next) => {
     html: `<p>To verfiy your email, please click on the following link: <a href="${verificationLink}">here</a></p>`,
   };
 
-  await transporter.sendMail(mailOptions, function(error, info) {
+  await transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
       return next(new AppError(`Error sending email: ${error}}`, 400));
     } else {
@@ -429,7 +429,7 @@ exports.emailVerification = catchAsync(async (req, res, next) => {
     data: req.user,
     message:
       "Email verification link sent to " +
-      req.user +
+      req.user.email +
       " Kindly check your inbox. Link expires in 1 hour.",
   });
 });

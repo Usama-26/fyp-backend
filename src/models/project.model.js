@@ -28,7 +28,7 @@ const projectSchema = new mongoose.Schema(
     status: {
       type: String,
       required: true,
-      enum: ["in progress", "listed", "completed"],
+      enum: ["assigned", "listed", "completed"],
       default: "listed",
     },
     tags: {
@@ -58,7 +58,13 @@ const projectSchema = new mongoose.Schema(
       ref: "Freelancer",
     },
     attachments: {
-      type: [String],
+      type: [
+        {
+          public_id: { type: String },
+          filename: { type: String },
+          secure_url: { type: String },
+        },
+      ],
     },
     proposals: [
       {

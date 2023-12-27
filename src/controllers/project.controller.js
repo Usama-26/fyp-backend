@@ -4,12 +4,35 @@ const AppError = require("../utils/appError");
 const cloudinaryUpload = require("../utils/cloudinaryUpload");
 const upload = require("../middlewares/multerStorage");
 const APIFeatures = require("../utils/apiFeatures");
+const byteSize = require("byte-size");
 
-// Create a new project
 const createProject = catchAsync(async (req, res, next) => {
+  let cloudinaryRes = [];
+  if (req.files && req.files.length > 0) {
+    for (const file of req.files) {
+      const b64 = Buffer.from(file.buffer).toString("base64");
+      const dataURI = "data:" + file.mimetype + ";base64," + b64;
+      const uploadResponse = await cloudinaryUpload(dataURI, {
+        folder: "projects",
+      });
+      cloudinaryRes.push({ ...uploadResponse, filename: file.originalname });
+    }
+  }
+
+  const attachments = cloudinaryRes.map(
+    ({ secure_url, filename, public_id, bytes, format }) => ({
+      secure_url,
+      filename,
+      format,
+      size: `${byteSize(bytes)}`,
+      public_id,
+    })
+  );
+
   const project = await Project.create({
     created_by: req.user._id,
     ...req.body,
+    attachments: attachments,
   });
 
   res.status(201).json({
