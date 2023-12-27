@@ -47,7 +47,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     return next(new AppError("Failed to create a new user.", 500));
   }
 
-  const token = generateToken({ id: newUser._id, type: newUser.user_type });
+  const token = generateToken({ id: newUser.email, });
 
   const verificationLink = `https://localhost:8000/api/v1/auth/verify_email?token=${token}`;
 
