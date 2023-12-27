@@ -7,10 +7,8 @@ const Client = require("../models/user.model").ClientSchema;
 const User = require("../models/user.model");
 
 const bcrypt = require("bcryptjs");
-const validator = require("validator");
-
+require("validator");
 const nodemailer = require("nodemailer");
-const { hash } = require("bcrypt");
 
 function generateToken(payload) {
   return jwt.sign(payload, process.env.JWT_SECRET, {
@@ -51,7 +49,7 @@ exports.signup = catchAsync(async (req, res, next) => {
 
   const token = generateToken({ id: newUser._id, type: newUser.user_type });
 
-  const verificationLink = `https://fyp-backend.up.railway.app/api/v1/auth/verify_email?token=${token}`;
+  const verificationLink = `https://localhost:8000/api/v1/auth/verify_email?token=${token}`;
 
   const transporter = nodemailer.createTransport({
     host: "smtp-relay.brevo.com",
@@ -67,7 +65,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     from: "support@chainwork.com",
     to: newUser.email,
     subject: "Welcome to ChainWork",
-    text: "Please verify your email to continue exploring all the features of workchain.",
+    text: "Please verify your email to continue exploring all the features of chainwork.",
     html: `<p>To verfiy your email, please click on the following link: <a href="${verificationLink}">here</a></p>`,
   };
 
@@ -376,8 +374,14 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 });
 
 exports.verifyEmail = catchAsync(async (req, res, next) => {
-  const freelancer = await Freelancer.findById(req.user.id);
-  const client = await Client.findById(req.user.id);
+  const { token } = req.query;
+
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+  const email = decoded.id;
+
+  const freelancer = await Freelancer.findOne({ email: email });
+  const client = await Client.findOne({ email: email });
 
   const user = freelancer || client;
 
@@ -390,14 +394,31 @@ exports.verifyEmail = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: "success",
-    message: "Email verification successful. ",
+    message: "Email verification successful.",
   });
 });
 
-exports.emailVerification = catchAsync(async (req, res, next) => {
-  const token = generateToken({ id: req.user._id, type: req.user.user_type });
+exports.sendVerificationEmail = catchAsync(async (req, res, next) => {
+  const { email } = req.body;
 
-  const verificationLink = `https://fyp-backend.up.railway.app/api/v1/auth/verify_email?token=${token}`;
+  const freelancer = await Freelancer.findOne({ email: email });
+  const client = await Client.findOne({ email: email });
+
+  const user = freelancer || client;
+
+  if (!user) {
+    return next(new AppError("Email not found.", 400));
+  }
+
+  if (user.with_google) {
+    return next(
+      new AppError("User signed in with google. Can't reset password", 400)
+    );
+  }
+
+  const token = generateToken({ id: user.email });
+
+  const verificationLink = `https://localhost:8000/api/v1/auth/verify_email?token=${token}`;
 
   const transporter = nodemailer.createTransport({
     host: "smtp-relay.brevo.com",
@@ -411,7 +432,7 @@ exports.emailVerification = catchAsync(async (req, res, next) => {
 
   const mailOptions = {
     from: "support@chainwork.com",
-    to: req.user.email,
+    to: email,
     subject: "Welcome to ChainWork",
     text: "Please verify your email to continue exploring all the features of ChainWork.",
     html: `<p>To verfiy your email, please click on the following link: <a href="${verificationLink}">here</a></p>`,
@@ -423,13 +444,13 @@ exports.emailVerification = catchAsync(async (req, res, next) => {
     } else {
     }
   });
+
   res.status(200).json({
     status: "success",
-    token,
-    data: req.user,
+    token: token,
     message:
       "Email verification link sent to " +
-      req.user +
+      email +
       " Kindly check your inbox. Link expires in 1 hour.",
   });
 });
