@@ -3,6 +3,7 @@ const User = require("../models/user.model");
 const AppError = require("../utils/appError");
 const { FreelancerSchema, ClientSchema } = require("../models/user.model");
 const cloudinaryUpload = require("../utils/cloudinaryUpload");
+const APIFeatures = require("../utils/apiFeatures");
 const Freelancer = require("../models/user.model").FreelancerSchema;
 const Client = require("../models/user.model").ClientSchema;
 
@@ -23,11 +24,16 @@ const getAllUsers = catchAsync(async (req, res, next) => {
 
 // Get All Freelancers
 const getAllFreelancers = catchAsync(async (req, res, next) => {
-  const freelancerUsers = await Freelancer.find();
-
+  // const freelancers = await Freelancer.find();
+  const features = new APIFeatures(
+    Freelancer.find(),
+    `hourly_rate[lte]=100&hourly_rate[gte]=100`
+  ).filter();
+  const freelancers = await features.query;
   res.status(200).json({
     status: "success",
-    data: freelancerUsers,
+    length: freelancers.length,
+    data: freelancers,
   });
 });
 
@@ -37,6 +43,7 @@ const getAllClients = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: "success",
+
     data: clientUsers,
   });
 });

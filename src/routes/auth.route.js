@@ -25,10 +25,10 @@ router.post("/resetPassword", resetPassword);
 
 router.patch("/updatePassword/:id", protect, updatePassword);
 
-router.post("/verify_email", verifyEmail);
+router.get("/verify_email", verifyEmail);
 
 router.get("/getCurrentUser", protect, getCurrentUser);
 
-router.post("/emailSend", sendVerificationEmail);
+router.post("/sendEmail", sendVerificationEmail);
 
 module.exports = router;

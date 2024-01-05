@@ -66,6 +66,15 @@ const projectSchema = new mongoose.Schema(
         },
       ],
     },
+    deliverables: {
+      type: [
+        {
+          public_id: { type: String },
+          filename: { type: String },
+          secure_url: { type: String },
+        },
+      ],
+    },
     proposals: [
       {
         type: mongoose.Schema.Types.ObjectId,

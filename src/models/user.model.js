@@ -92,6 +92,7 @@ const userSchema = new Schema(
     is_profile_completed: {
       type: Boolean,
     },
+    wallet_address: { type: String },
   },
   { toJSON: { virtuals: true }, timestamps: true }
 );

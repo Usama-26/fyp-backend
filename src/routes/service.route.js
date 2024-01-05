@@ -7,6 +7,7 @@ const {
   deleteService,
   updateService,
   getServiceByPath,
+  deleteAll,
   getBySubCategory,
 } = require("./../controllers/service.controller");
 

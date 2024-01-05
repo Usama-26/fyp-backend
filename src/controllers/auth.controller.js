@@ -1,14 +1,13 @@
 const jwt = require("jsonwebtoken");
 const { promisify } = require("util");
+const bcrypt = require("bcryptjs");
+const nodemailer = require("nodemailer");
+const dotenv = require("dotenv");
+const { StreamChat } = require("stream-chat");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const Freelancer = require("../models/user.model").FreelancerSchema;
 const Client = require("../models/user.model").ClientSchema;
-const User = require("../models/user.model");
-
-const bcrypt = require("bcryptjs");
-require("validator");
-const nodemailer = require("nodemailer");
 
 function generateToken(payload) {
   return jwt.sign(payload, process.env.JWT_SECRET, {
@@ -16,18 +15,27 @@ function generateToken(payload) {
   });
 }
 
+dotenv.config({ path: `${__dirname}/../../config.env` });
+const streamChat = StreamChat.getInstance(
+  process.env.GETSTREAM_API_KEY,
+  process.env.GETSTREAM_API_SECRET
+);
+
 exports.signup = catchAsync(async (req, res, next) => {
   const { email } = req.body;
+
+  // Finding Existing User
   const freelancer = await Freelancer.findOne({ email: email });
   const client = await Client.findOne({ email: email });
 
   const user = freelancer || client;
 
+  // Checking If exisiting user is signed up with Google
   if (user) {
     if (user.with_google) {
       return next(
         new AppError(
-          "This user was previously joined by a different authentication method."
+          "This user was previously joined by using Google OAuth 2.0."
         )
       );
     } else {
@@ -35,6 +43,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     }
   }
 
+  // User Creation
   let newUser;
 
   if (req.body.user_type === "freelancer") {
@@ -42,15 +51,13 @@ exports.signup = catchAsync(async (req, res, next) => {
   } else if (req.body.user_type === "client") {
     newUser = await Client.create(req.body);
   }
-
   if (!newUser) {
     return next(new AppError("Failed to create a new user.", 500));
   }
-
   const token = generateToken({ id: newUser._id, type: newUser.user_type });
 
+  // Email Sending
   const verificationLink = `https://localhost:8000/api/v1/auth/verify_email?token=${token}`;
-
   const transporter = nodemailer.createTransport({
     host: "smtp-relay.brevo.com",
     port: 587,
@@ -60,7 +67,6 @@ exports.signup = catchAsync(async (req, res, next) => {
       pass: "5HUmBnIY7jO38dys",
     },
   });
-
   const mailOptions = {
     from: "support@chainwork.com",
     to: newUser.email,
@@ -75,6 +81,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     } else {
     }
   });
+
   res.status(200).json({
     status: "success",
     token,
@@ -144,7 +151,6 @@ exports.protect = catchAsync(async (req, res, next) => {
       )
     );
   }
-
   req.user = currentUser;
   res.locals.user = currentUser;
   next();
@@ -163,7 +169,6 @@ exports.withGoogle = catchAsync(async (req, res, next) => {
   let token;
 
   if (user) {
-    console.log("111", user);
     if (user.with_google) {
       token = generateToken({ id: user._id, type: user.user_type });
 
@@ -195,6 +200,7 @@ exports.withGoogle = catchAsync(async (req, res, next) => {
   } else if (userData.user_type === "client") {
     newUser = await Client.create(userData);
   }
+
 
   token = generateToken({ id: newUser._id, type: newUser.user_type });
 
