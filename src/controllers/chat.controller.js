@@ -20,30 +20,16 @@ exports.createChatUser = catchAsync(async (req, res, next) => {
     );
   }
 
-  let chatToken = "";
-
-  const existingUser = await streamChat.queryUsers({ id: user.id });
-
-  if (existingUser.users.length > 0) {
-    chatToken = streamChat.createToken(existingUser.users[0].id);
-    return res.status(200).json({
-      status: "success",
-      chatToken: chatToken,
-      data: existingUser.users[0],
-    });
-  }
-
-  const newUser = await streamChat.upsertUser({
+  const { users } = await streamChat.upsertUser({
     id: user.id,
+    image: user.profile_photo,
     fullName: `${user.firstName} ${user.lastName}`,
     email: user.email,
   });
-
-  if (!newUser) {
+  if (!users) {
     new AppError("A Chat User can't be created.", 500);
   }
+  const chatToken = streamChat.createToken(`${users[user.id].id}`);
 
-  chatToken = streamChat.createToken(newUser.users[0].id);
-
-  res.status(200).json({ status: "success", data: req.user });
+  res.status(200).json({ status: "success", chatToken, data: req.user });
 });
