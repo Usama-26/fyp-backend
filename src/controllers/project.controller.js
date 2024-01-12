@@ -29,7 +29,6 @@ const createProject = catchAsync(async (req, res, next) => {
     })
   );
 
-  console.log(req.body.tags.split(","));
   const project = await Project.create({
     created_by: req.user._id,
     ...req.body,
@@ -49,7 +48,6 @@ const getAllProjects = catchAsync(async (req, res, next) => {
 
   const projects = await features.query;
 
-  console.log(req.query);
 
   res.status(200).json({
     status: "success",

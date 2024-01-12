@@ -201,7 +201,6 @@ exports.withGoogle = catchAsync(async (req, res, next) => {
     newUser = await Client.create(userData);
   }
 
-
   token = generateToken({ id: newUser._id, type: newUser.user_type });
 
   res.status(201).json({
@@ -424,7 +423,7 @@ exports.sendVerificationEmail = catchAsync(async (req, res, next) => {
 
   const token = generateToken({ id: user.email });
 
-  const verificationLink = `https://localhost:8000/api/v1/auth/verify_email?token=${token}`;
+  const verificationLink = `https://fyp-backend.up.railway.app/api/v1/auth/verify_email?token=${token}`;
 
   const transporter = nodemailer.createTransport({
     host: "smtp-relay.brevo.com",

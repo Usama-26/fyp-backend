@@ -42,7 +42,6 @@ router
     }
   })
   .delete((req, res, next) => {
-    // Define the logic to delete either a Freelancer or Client based on user type
     const { user_type } = req.body;
 
     if (user_type === "freelancer") {

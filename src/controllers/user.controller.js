@@ -24,12 +24,15 @@ const getAllUsers = catchAsync(async (req, res, next) => {
 
 // Get All Freelancers
 const getAllFreelancers = catchAsync(async (req, res, next) => {
-  // const freelancers = await Freelancer.find();
-  const features = new APIFeatures(
-    Freelancer.find(),
-    `hourly_rate[lte]=100&hourly_rate[gte]=100`
-  ).filter();
-  const freelancers = await features.query;
+  let freelancers = null;
+  console.log(req.query);
+  if (req.query) {
+    const features = new APIFeatures(Freelancer.find(), req.query).filter();
+    freelancers = await features.query;
+  } else {
+    freelancers = await Freelancer.find(req.query);
+  }
+
   res.status(200).json({
     status: "success",
     length: freelancers.length,
@@ -43,7 +46,7 @@ const getAllClients = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: "success",
-
+    length: clientUsers.length,
     data: clientUsers,
   });
 });
