@@ -25,7 +25,7 @@ router
   .route("/:id")
   .get(getProjectById)
   .delete(protect, deleteProject)
-  .patch(protect, upload.array("attachments"), updateProject);
+  .patch(upload.array("attachments"), updateProject);
 
 router.patch(
   "/send_deliverables/:id",

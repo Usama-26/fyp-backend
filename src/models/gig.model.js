@@ -33,7 +33,6 @@ const gigSchema = new mongoose.Schema(
     },
     tags: [{ type: String, required: true }],
 
-    // Pricing
     pricingModel: {
       type: String,
       enum: ["fixed price"],
@@ -51,20 +50,12 @@ const gigSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-
-    attachments: [String], // Store file paths or references here
-
-    // Availability
-    availability: {
-      online: {
-        type: Boolean,
-        default: false,
+    reviews: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Review",
       },
-      onLocation: {
-        type: Boolean,
-        default: false,
-      },
-    },
+    ],
   },
   {
     timestamps: true,

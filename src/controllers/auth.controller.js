@@ -57,7 +57,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   const token = generateToken({ id: newUser._id, type: newUser.user_type });
 
   // Email Sending
-  const verificationLink = `https://localhost:8000/api/v1/auth/verify_email?token=${token}`;
+  const verificationLink = `https://fyp-backend.up.railway.app/api/v1/auth/verify_email?token=${token}`;
   const transporter = nodemailer.createTransport({
     host: "smtp-relay.brevo.com",
     port: 587,
@@ -237,7 +237,7 @@ exports.sendResetPassMail = catchAsync(async (req, res, next) => {
 
   const resetToken = generateToken({ id: email });
 
-  const resetLink = `http://localhost:3000/auth/reset_password?token=${resetToken}`;
+  const resetLink = `https://chainwork-frontend.vercel.app/auth/reset_password?token=${resetToken}`;
 
   const transporter = nodemailer.createTransport({
     host: "smtp-relay.brevo.com",

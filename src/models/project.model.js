@@ -57,6 +57,10 @@ const projectSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Freelancer",
     },
+    gig: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Gig",
+    },
     attachments: {
       type: [
         {
@@ -79,6 +83,15 @@ const projectSchema = new mongoose.Schema(
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Proposal",
+      },
+    ],
+    transaction_id: {
+      type: String,
+    },
+    reviews: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Review",
       },
     ],
   },

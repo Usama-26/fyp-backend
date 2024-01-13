@@ -92,6 +92,13 @@ const userSchema = new Schema(
     is_profile_completed: {
       type: Boolean,
     },
+    reviews: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Review",
+      },
+    ],
+
     wallet_address: { type: String },
   },
   { toJSON: { virtuals: true }, timestamps: true }
