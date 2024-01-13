@@ -48,7 +48,6 @@ const getAllProjects = catchAsync(async (req, res, next) => {
 
   const projects = await features.query;
 
-
   res.status(200).json({
     status: "success",
     length: projects.length,
@@ -60,6 +59,9 @@ const getAllProjects = catchAsync(async (req, res, next) => {
 const getProjectById = catchAsync(async (req, res, next) => {
   const projectId = req.params.id;
   const project = await Project.findById(projectId).populate([
+    {
+      path: "reviews",
+    },
     {
       path: "proposals",
       populate: {

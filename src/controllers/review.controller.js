@@ -3,6 +3,17 @@ const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 
 const createReview = catchAsync(async (req, res, next) => {
+  const existing = await Review.find({
+    from: req.body.from,
+    to: req.body.to,
+    project: req.body.project,
+  });
+
+  if (existing) {
+    return next(
+      new AppError("You have already posted a review on this project.", 400)
+    );
+  }
   const review = await Review.create(req.body);
 
   res.status(201).json({
@@ -16,6 +27,7 @@ const getAllReviews = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: "success",
+    length: reviews.length,
     data: reviews,
   });
 });
@@ -32,9 +44,10 @@ const getReviewById = catchAsync(async (req, res, next) => {
 });
 
 const updateReview = catchAsync(async (req, res, next) => {
-  const updatedReview = await res.status(200).json({
+  const review = await Review.findByIdAndUpdate(reviewId, req.body);
+  res.status(200).json({
     status: "success",
-    data: updatedReview,
+    data: review,
   });
 });
 
@@ -49,6 +62,15 @@ const deleteReview = catchAsync(async (req, res, next) => {
 
   res.status(204).json();
 });
+const deleteReviews = catchAsync(async (req, res, next) => {
+  const deletedReview = await Review.deleteMany();
+
+  if (!deletedReview) {
+    return next(new AppError("Review not found", 404));
+  }
+
+  res.status(204).json();
+});
 
 module.exports = {
   createReview,
@@ -56,4 +78,5 @@ module.exports = {
   getReviewById,
   updateReview,
   deleteReview,
+  deleteReviews,
 };

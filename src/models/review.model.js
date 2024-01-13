@@ -77,10 +77,47 @@ reviewSchema.post("save", async function (next) {
       { new: true }
     );
 
-    console.log("From Client", fromClient);
-    console.log("To Freelancer", toFreelancer);
-    console.log("Project", project);
-    console.log("Gig", gig);
+    if (!toClient || !toFreelancer) {
+      next(new AppError("Review recipient doesn't exist.", 404));
+    }
+  } catch (error) {}
+});
+
+reviewSchema.pre("findOneAndDelete", async function (next) {
+  try {
+    const toClient = await ClientSchema.updateOne(
+      { _id: this.to },
+      { $pull: { reviews: this._id } },
+      { new: true }
+    );
+    const toFreelancer = await FreelancerSchema.updateOne(
+      { _id: this.to },
+      { $pull: { reviews: this._id } },
+      { new: true }
+    );
+
+    const fromClient = await ClientSchema.updateOne(
+      { _id: this.from },
+      { $pull: { reviews: this._id } },
+      { new: true }
+    );
+    const fromFreelancer = await FreelancerSchema.updateOne(
+      { _id: this.from },
+      { $pull: { reviews: this._id } },
+      { new: true }
+    );
+
+    const gig = await Gig.updateOne(
+      { _id: this.gig },
+      { $push: { reviews: this._id } },
+      { new: true }
+    );
+
+    const project = await Project.updateOne(
+      { _id: this.project },
+      { $push: { reviews: this._id } },
+      { new: true }
+    );
 
     if (!toClient || !toFreelancer) {
       next(new AppError("Review recipient doesn't exist.", 404));
