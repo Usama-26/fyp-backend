@@ -1,5 +1,4 @@
 const Category = require("../models/category.model");
-const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 
 const getAllCategories = catchAsync(async (req, res, next) => {
@@ -9,7 +8,6 @@ const getAllCategories = catchAsync(async (req, res, next) => {
       path: "sub_categories",
       populate: { path: "services" },
     });
-
   res.status(200).json({
     status: "success",
     length: categories.length,

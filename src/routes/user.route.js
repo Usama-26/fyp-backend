@@ -41,8 +41,7 @@ router
       return updateClient(req, res, next);
     }
   })
-  .delete(protect, (req, res, next) => {
-    // Define the logic to delete either a Freelancer or Client based on user type
+  .delete((req, res, next) => {
     const { user_type } = req.body;
 
     if (user_type === "freelancer") {

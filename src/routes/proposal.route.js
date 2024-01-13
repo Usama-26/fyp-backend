@@ -1,19 +1,16 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 const {
   createProposal,
-  getAllProposalsForProject,
-  getProposalById
-} = require('./../controllers/proposal.controller');
+  getProposalById,
+} = require("./../controllers/proposal.controller");
 const { protect } = require("../controllers/auth.controller");
+const upload = require("../middlewares/multerStorage");
 
 // Create a new proposal
-router.route('/').post(protect, createProposal);
-
-// Get all proposals for a specific project
-router.get('/project/:projectId', getAllProposalsForProject);
+router.route("/").post(protect, upload.array("attachments"), createProposal);
 
 // Get a proposal by its ID
-router.get('/:id', getProposalById);
+router.get("/:id", getProposalById);
 
 module.exports = router;

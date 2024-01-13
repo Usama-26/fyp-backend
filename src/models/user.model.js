@@ -71,6 +71,15 @@ const userSchema = new Schema(
     phone_number: {
       type: String,
     },
+    industry: {
+      type: String,
+    },
+    languages: [
+      {
+        name: { type: String },
+        proficiency: { type: String },
+      },
+    ],
     is_active: {
       type: Boolean,
       default: true,
@@ -83,18 +92,14 @@ const userSchema = new Schema(
     is_profile_completed: {
       type: Boolean,
     },
-    payment_method: {
-      wallet_address: {
-        type: String,
-        trim: true,
+    reviews: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Review",
       },
-      wallet_name: {
-        type: String,
-      },
-    },
-    payment_verified: {
-      type: Boolean,
-    },
+    ],
+
+    wallet_address: { type: String },
   },
   { toJSON: { virtuals: true }, timestamps: true }
 );
@@ -107,6 +112,8 @@ userFreelancerSchema.add({
       ref: "Gigs",
     },
   ],
+  profile_title: { type: String },
+  main_service: { type: String },
   max_gigs: {
     type: Number,
     default: 5,
@@ -114,6 +121,9 @@ userFreelancerSchema.add({
   level: {
     type: String,
     enum: ["beginner", "one", "two", "expert"],
+  },
+  hourly_rate: {
+    type: Number,
   },
   proposals: [
     {
@@ -124,6 +134,12 @@ userFreelancerSchema.add({
   skills: {
     type: [String],
   },
+  projects: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Projects",
+    },
+  ],
 });
 
 const userClientSchema = userSchema.clone();
@@ -138,9 +154,6 @@ userClientSchema.add({
     type: String,
     enum: ["individual", "company"],
     default: "individual",
-  },
-  industry: {
-    type: String,
   },
   company_name: {
     type: String,
@@ -162,13 +175,31 @@ userSchema.virtual("profile_completion").get(function () {
   // Define the required fields for each user type
   const requiredFields = {
     freelancer: [
+      "firstName",
+      "lastName",
+      "email",
       "profile_photo",
       "email_verified",
       "address",
+      "industry",
+      "main_service",
+      "profile_title",
+      "bio",
       "skills",
-      "payment_verified",
+      "hourly_rate",
     ],
-    client: ["profile_photo", "email_verified", "address", "payment_verified"],
+    client: [
+      "firstName",
+      "lastName",
+      "email",
+      "profile_photo",
+      "email_verified",
+      "bio",
+      "address",
+      "industry",
+      "preferred_skills",
+      "client_scope",
+    ],
   };
 
   // Determine the user type based on the presence of certain fields

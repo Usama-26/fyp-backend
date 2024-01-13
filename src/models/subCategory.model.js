@@ -11,7 +11,6 @@ const subCategorySchema = new Schema(
     },
     punchline: {
       type: String,
-      required: true,
     },
     path: {
       type: String,

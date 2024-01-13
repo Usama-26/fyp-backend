@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const gigSchema = new mongoose.Schema(
   {
-    userId: {
+    created_by: {
       required: true,
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -12,25 +12,30 @@ const gigSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    description: {
+      type: String,
+      required: true,
+    },
     category: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
+      ref: "Category",
     },
-    subcategory: {
-      type: String,
+    sub_category: {
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
+      ref: "SubCategory",
     },
-    serviceType: {
-      type: String,
-      enum: ["one-time", "ongoing"],
+    service: {
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
+      ref: "Service",
     },
-    tags: [String],
+    tags: [{ type: String, required: true }],
 
-    // Pricing
     pricingModel: {
       type: String,
-      enum: ["fixed price", "hourly rate", "other"],
+      enum: ["fixed price"],
       required: true,
     },
     pricingDetails: {
@@ -45,92 +50,12 @@ const gigSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-
-    // Requirements
-    clientRequirements: {
-      type: String,
-    },
-    attachments: [String], // Store file paths or references here
-
-    // Description
-    serviceDescription: {
-      type: String,
-      required: true,
-    },
-    FAQs: [
+    reviews: [
       {
-        question: String,
-        answer: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Review",
       },
     ],
-
-    // Gallery or Portfolio
-    portfolioSamples: [String], // Store references to portfolio samples here
-    visuals: [String], // Store image or video references here
-    clientReviews: [
-      {
-        rating: Number,
-        comment: String,
-      },
-    ],
-
-    // Availability
-    availability: {
-      online: {
-        type: Boolean,
-        default: false,
-      },
-      onLocation: {
-        type: Boolean,
-        default: false,
-      },
-    },
-
-    // Expertise
-    skills: [String],
-
-    // Additional Information
-    language: {
-      type: String,
-    },
-    location: {
-      type: String,
-    },
-    qualifications: {
-      type: String,
-    },
-    education: {
-      type: String,
-    },
-
-    // Certifications
-    certifications: [String],
-
-    // Employment History
-    workExperience: [
-      {
-        title: String,
-        company: String,
-        startDate: Date,
-        endDate: Date,
-      },
-    ],
-
-    // Custom Extras (if your platform supports custom offers)
-    customExtras: [
-      {
-        title: String,
-        price: String,
-      },
-    ],
-
-    // Review
-    platformGuidelines: String,
-    requiresReview: Boolean,
-    isPublished: {
-      type: Boolean,
-      default: false,
-    },
   },
   {
     timestamps: true,

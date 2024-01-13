@@ -9,16 +9,28 @@ const {
   updateProject,
   deleteProject,
   getClientProjects,
+  getFreelancerProjects,
+  sendDeliverables,
 } = require("./../controllers/project.controller");
 
-router.route("/").post(protect, createProject).get(getAllProjects);
+router
+  .route("/")
+  .post(protect, upload.array("attachments"), createProject)
+  .get(getAllProjects);
 
 router.get("/get_client_projects/:id", protect, getClientProjects);
+router.get("/get_freelancer_projects/:id", protect, getFreelancerProjects);
 
 router
   .route("/:id")
   .get(getProjectById)
   .delete(protect, deleteProject)
-  .patch(protect, upload.array("attachments"), updateProject);
+  .patch(upload.array("attachments"), updateProject);
 
+router.patch(
+  "/send_deliverables/:id",
+  protect,
+  upload.array("deliverables"),
+  sendDeliverables
+);
 module.exports = router;

@@ -28,7 +28,7 @@ const projectSchema = new mongoose.Schema(
     status: {
       type: String,
       required: true,
-      enum: ["awarded", "listed"],
+      enum: ["assigned", "listed", "completed"],
       default: "listed",
     },
     tags: {
@@ -53,17 +53,45 @@ const projectSchema = new mongoose.Schema(
       ref: "Client",
       required: true,
     },
-    freelancer_id: {
+    assigned_to: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Freelancer",
     },
+    gig: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Gig",
+    },
     attachments: {
-      type: [String],
+      type: [
+        {
+          public_id: { type: String },
+          filename: { type: String },
+          secure_url: { type: String },
+        },
+      ],
+    },
+    deliverables: {
+      type: [
+        {
+          public_id: { type: String },
+          filename: { type: String },
+          secure_url: { type: String },
+        },
+      ],
     },
     proposals: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Proposal",
+      },
+    ],
+    transaction_id: {
+      type: String,
+    },
+    reviews: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Review",
       },
     ],
   },

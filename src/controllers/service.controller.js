@@ -74,6 +74,11 @@ const getBySubCategory = catchAsync(async (req, res, next) => {
   });
 });
 
+const deleteAll = catchAsync(async (req, res, next) => {
+  const response = await Service.deleteMany({});
+  res.status(204).send("Successfully Deleted");
+});
+
 module.exports = {
   getAllServices,
   createService,
@@ -82,4 +87,5 @@ module.exports = {
   updateService,
   getServiceByPath,
   getBySubCategory,
+  deleteAll,
 };
