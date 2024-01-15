@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const { FreelancerSchema } = require("./user.model");
+const AppError = require("../utils/appError");
 
 const gigSchema = new mongoose.Schema(
   {
@@ -7,7 +9,6 @@ const gigSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-    // Basic Information
     title: {
       type: String,
       required: true,
@@ -32,24 +33,28 @@ const gigSchema = new mongoose.Schema(
       ref: "Service",
     },
     tags: [{ type: String, required: true }],
-
-    pricingModel: {
-      type: String,
-      enum: ["fixed price"],
-      required: true,
+    gallery: {
+      type: [
+        {
+          public_id: { type: String },
+          filename: { type: String },
+          secure_url: { type: String },
+          size: { type: String },
+          format: { type: String },
+        },
+      ],
     },
-    pricingDetails: {
-      type: String,
-      required: true,
+    delivery_days: [{ type: Number }],
+    avg_reviews: { type: Number },
+    revisions: { type: Number },
+    orders: [{ type: mongoose.Schema.Types.ObjectId, ref: "Project" }],
+    price: { type: Number },
+    fast_delivery: {
+      delivery_days: { type: Number },
+      extra_price: { type: Number },
     },
-    deliveryTime: {
-      type: String,
-      required: true,
-    },
-    revisions: {
-      type: Number,
-      required: true,
-    },
+    status: { type: String, enum: ["active", "paused"], default: "active" },
+    is_completed: { type: String },
     reviews: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -61,6 +66,36 @@ const gigSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+gigSchema.pre("save", async function (next) {
+  try {
+    const freelancer = await FreelancerSchema.findByIdAndUpdate(
+      { _id: this.created_by },
+      { $push: { gigs: this._id } },
+      { new: true }
+    );
+    if (!freelancer) {
+      return next(new AppError("Freelancer Not Found"), 404);
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+gigSchema.pre("findOneAndDelete", async function (next) {
+  try {
+    const freelancer = await FreelancerSchema.findByIdAndUpdate(
+      { _id: this.created_by },
+      { $pull: { gigs: this._id } },
+      { new: true }
+    );
+    if (!freelancer) {
+      return next(new AppError("Freelancer Not Found"), 404);
+    }
+  } catch (error) {
+    next(error);
+  }
+});
 
 const Gig = mongoose.model("Gig", gigSchema);
 

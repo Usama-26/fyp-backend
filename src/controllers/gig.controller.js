@@ -1,35 +1,99 @@
-const Gig = require('../models/gig.model');
-const AppError = require('../utils/appError');
-const catchAsync = require('../utils/catchAsync');
+const byteSize = require("byte-size");
+const Gig = require("../models/gig.model");
+const AppError = require("../utils/appError");
+const catchAsync = require("../utils/catchAsync");
+const cloudinaryUpload = require("../utils/cloudinaryUpload");
 
 // Create a new Gig
 const createGig = catchAsync(async (req, res, next) => {
-  if (req.user.gigs.length <= req.user.max_gigs) {
-    return next(new AppError('Gigs slots filled. Buy more gig slots.', 404));
-  }
-
-  const gig = await Gig.create(req.body);
+  const gig = await Gig.create({
+    created_by: req.user._id,
+    ...req.body,
+  });
 
   res.status(201).json({
-    status: 'success',
+    status: "success",
     data: gig,
   });
 });
 
 // Update a Gig by ID
-const updateGig = catchAsync(async (req, res, next) => {
+const updateGigOverview = catchAsync(async (req, res, next) => {
   const gig = await Gig.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
   });
 
   if (!gig) {
-    return next(new AppError('No gig found', 404));
+    return next(new AppError("No gig found", 404));
   }
 
   res.status(200).json({
-    status: 'success',
+    status: "success",
     data: gig,
+  });
+});
+
+const updateGigPricing = catchAsync(async (req, res, next) => {
+  const priceData = req.body;
+  const updatedGig = await Gig.findByIdAndUpdate(req.params.id, priceData, {
+    new: true,
+    runValidators: true,
+  });
+
+  if (!updatedGig) {
+    return next(
+      new AppError(
+        "Something went wrong while updating your gig. Please try again later."
+      ),
+      500
+    );
+  }
+  res.status.json({
+    status: "success",
+    data: updatedGig,
+  });
+});
+
+const updateGigGallery = catchAsync(async (req, res, next) => {
+  let cloudinaryRes = [];
+  if (req.files && req.files.length > 0) {
+    for (const file of req.files) {
+      const b64 = Buffer.from(file.buffer).toString("base64");
+      const dataURI = "data:" + file.mimetype + ";base64," + b64;
+      const uploadResponse = await cloudinaryUpload(dataURI, {
+        folder: "projects",
+      });
+      cloudinaryRes.push({ ...uploadResponse, filename: file.originalname });
+    }
+  }
+
+  const gallery = cloudinaryRes.map(
+    ({ secure_url, filename, public_id, bytes, format }) => ({
+      secure_url,
+      filename,
+      format,
+      size: `${byteSize(bytes)}`,
+      public_id,
+    })
+  );
+
+  const updatedGig = await Gig.findByIdAndUpdate(req.params.id, gallery, {
+    new: true,
+    runValidators: true,
+  });
+
+  if (!updatedGig) {
+    return next(
+      new AppError(
+        "Something went wrong while updating your gig. Please try again later."
+      ),
+      500
+    );
+  }
+  res.status.json({
+    status: "success",
+    data: updatedGig,
   });
 });
 
@@ -38,11 +102,25 @@ const getAllGigs = catchAsync(async (req, res, next) => {
   const gigs = await Gig.find();
 
   if (!gigs || gigs.length === 0) {
-    return next(new AppError('No Gig Found', 404));
+    return next(new AppError("No Gig Found", 404));
   }
 
   res.status(200).json({
-    status: 'success',
+    status: "success",
+    length: gigs.length,
+    data: gigs,
+  });
+});
+
+const getFreelancerGigs = catchAsync(async (req, res, next) => {
+  const gigs = await Gig.find({ created_by: req.user._id });
+
+  if (!gigs || gigs.length === 0) {
+    return next(new AppError("No Gig Found", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
     length: gigs.length,
     data: gigs,
   });
@@ -53,11 +131,11 @@ const getGigById = catchAsync(async (req, res, next) => {
   const gig = await Gig.findById(req.params.id);
 
   if (!gig) {
-    return next(new AppError('No gig found', 404));
+    return next(new AppError("No gig found", 404));
   }
 
   res.status(200).json({
-    status: 'success',
+    status: "success",
     data: gig,
   });
 });
@@ -67,11 +145,11 @@ const deleteGig = catchAsync(async (req, res, next) => {
   const gig = await Gig.findByIdAndDelete(req.params.id);
 
   if (!gig) {
-    return next(new AppError('Gig not found', 404));
+    return next(new AppError("Gig not found", 404));
   }
 
   res.status(204).json({
-    status: 'success',
+    status: "success",
     data: null,
   });
 });
@@ -80,6 +158,9 @@ module.exports = {
   getGigById,
   getAllGigs,
   deleteGig,
-  updateGig,
+  getFreelancerGigs,
+  updateGigOverview,
+  updateGigPricing,
+  updateGigGallery,
   createGig,
 };

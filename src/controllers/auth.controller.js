@@ -30,7 +30,7 @@ exports.signup = catchAsync(async (req, res, next) => {
 
   const user = freelancer || client;
 
-  // Checking If exisiting user is signed up with Google
+  // Checking If existing user is signed up with Google
   if (user) {
     if (user.with_google) {
       return next(
@@ -54,7 +54,8 @@ exports.signup = catchAsync(async (req, res, next) => {
   if (!newUser) {
     return next(new AppError("Failed to create a new user.", 500));
   }
-  const token = generateToken({ id: newUser._id, type: newUser.user_type });
+
+  const token = generateToken({ id: newUser._id, email: email });
 
   // Email Sending
   const verificationLink = `https://fyp-backend.up.railway.app/api/v1/auth/verify_email?token=${token}`;
@@ -88,7 +89,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     data: newUser,
     message:
       "Email verification link sent to " +
-      user +
+      email +
       " Kindly check your inbox. Link expires in 1 hour.",
   });
 });
@@ -383,15 +384,23 @@ exports.verifyEmail = catchAsync(async (req, res, next) => {
 
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-  const email = decoded.id;
+  const userID = decoded.id;
+  const email = decoded.email;
 
-  const freelancer = await Freelancer.findOne({ email: email });
-  const client = await Client.findOne({ email: email });
+  let freelancer = await Freelancer.findOne({ email: email });
+  let client = await Client.findOne({ email: email });
 
-  const user = freelancer || client;
+  let user = freelancer || client;
 
   if (!user) {
-    return next(new AppError("User not found", 404));
+    freelancer = await Freelancer.findOne({ _id: userID });
+    client = await Client.findOne({ _id: userID });
+
+    user = freelancer || client;
+
+    if (!user) {
+      return next(new AppError("User not found", 404));
+    }
   }
 
   user.email_verified = true;
@@ -421,7 +430,7 @@ exports.sendVerificationEmail = catchAsync(async (req, res, next) => {
     );
   }
 
-  const token = generateToken({ id: user.email });
+  const token = generateToken({ id: user._id, email: user.email });
 
   const verificationLink = `https://fyp-backend.up.railway.app/api/v1/auth/verify_email?token=${token}`;
 
