@@ -38,15 +38,19 @@ const createProject = catchAsync(async (req, res, next) => {
 
   res.status(201).json({
     status: "success",
-    // data: project,
+    data: project,
   });
 });
 
 // Get all projects
 const getAllProjects = catchAsync(async (req, res, next) => {
-  const features = new APIFeatures(Project.find(), req.query).filter();
-
-  const projects = await features.query;
+  let projects;
+  if (req.query) {
+    const features = new APIFeatures(Project.find(), req.query).filter();
+    projects = await features.query;
+  } else {
+    projects = await Project.find(req.query);
+  }
 
   res.status(200).json({
     status: "success",

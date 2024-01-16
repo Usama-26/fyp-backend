@@ -98,7 +98,7 @@ const userSchema = new Schema(
         ref: "Review",
       },
     ],
-
+    avg_rating: { type: Number, default: 0.0 },
     wallet_address: { type: String },
   },
   { toJSON: { virtuals: true }, timestamps: true }
@@ -121,6 +121,7 @@ userFreelancerSchema.add({
   level: {
     type: String,
     enum: ["beginner", "one", "two", "expert"],
+    default: "beginner",
   },
   hourly_rate: {
     type: Number,

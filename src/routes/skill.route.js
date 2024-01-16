@@ -11,7 +11,7 @@ const {
 
 const { protect } = require("../controllers/auth.controller");
 
-router.post("/", protect, createSkill);
+router.post("/", createSkill);
 
 router.get("/", getAllSkills);
 

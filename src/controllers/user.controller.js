@@ -25,7 +25,7 @@ const getAllUsers = catchAsync(async (req, res, next) => {
 // Get All Freelancers
 const getAllFreelancers = catchAsync(async (req, res, next) => {
   let freelancers = null;
-  console.log(req.query);
+
   if (req.query) {
     const features = new APIFeatures(Freelancer.find(), req.query).filter();
     freelancers = await features.query;

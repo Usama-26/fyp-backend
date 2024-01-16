@@ -49,7 +49,7 @@ const updateGigPricing = catchAsync(async (req, res, next) => {
       500
     );
   }
-  res.status.json({
+  res.status(200).json({
     status: "success",
     data: updatedGig,
   });
@@ -62,26 +62,32 @@ const updateGigGallery = catchAsync(async (req, res, next) => {
       const b64 = Buffer.from(file.buffer).toString("base64");
       const dataURI = "data:" + file.mimetype + ";base64," + b64;
       const uploadResponse = await cloudinaryUpload(dataURI, {
-        folder: "projects",
+        folder: "gallery",
       });
       cloudinaryRes.push({ ...uploadResponse, filename: file.originalname });
     }
   }
 
   const gallery = cloudinaryRes.map(
-    ({ secure_url, filename, public_id, bytes, format }) => ({
+    ({ secure_url, filename, public_id, bytes, format, width, height }) => ({
       secure_url,
       filename,
       format,
+      width,
+      height,
       size: `${byteSize(bytes)}`,
       public_id,
     })
   );
 
-  const updatedGig = await Gig.findByIdAndUpdate(req.params.id, gallery, {
-    new: true,
-    runValidators: true,
-  });
+  const updatedGig = await Gig.findByIdAndUpdate(
+    req.params.id,
+    { gallery: gallery },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
 
   if (!updatedGig) {
     return next(
@@ -91,7 +97,7 @@ const updateGigGallery = catchAsync(async (req, res, next) => {
       500
     );
   }
-  res.status.json({
+  res.status(200).json({
     status: "success",
     data: updatedGig,
   });
@@ -112,8 +118,15 @@ const getAllGigs = catchAsync(async (req, res, next) => {
   });
 });
 
-const getFreelancerGigs = catchAsync(async (req, res, next) => {
-  const gigs = await Gig.find({ created_by: req.user._id });
+const getGigsBySubCategory = catchAsync(async (req, res, next) => {
+  const gigs = await Gig.find({ sub_category: req.params.id })
+    .select(
+      "title description price gallery avg_rating created_by delivery_days reviews"
+    )
+    .populate({
+      path: "created_by",
+      select: "firstName lastName profile_photo level",
+    });
 
   if (!gigs || gigs.length === 0) {
     return next(new AppError("No Gig Found", 404));
@@ -126,9 +139,47 @@ const getFreelancerGigs = catchAsync(async (req, res, next) => {
   });
 });
 
+const getGigsByService = catchAsync(async (req, res, next) => {
+  const gigs = await Gig.find({ service: req.params.id })
+    .select(
+      "title description price gallery avg_rating created_by delivery_days reviews"
+    )
+    .populate({
+      path: "created_by",
+      select: "firstName lastName profile_photo level",
+    });
+
+  if (!gigs || gigs.length === 0) {
+    return next(new AppError("No Gig Found", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    length: gigs.length,
+    data: gigs,
+  });
+});
+
+const getFreelancerGigs = catchAsync(async (req, res, next) => {
+  const gigs = await Gig.find({ created_by: req.user._id }).populate({
+    path: "created_by",
+    select: "firstName lastName profile_photo level",
+  });
+
+  res.status(200).json({
+    status: "success",
+    length: gigs.length,
+    data: gigs,
+  });
+});
+
 // Get a Gig by ID
 const getGigById = catchAsync(async (req, res, next) => {
-  const gig = await Gig.findById(req.params.id);
+  const gig = await Gig.findById(req.params.id).populate({
+    path: "created_by",
+    select:
+      "firstName lastName profile_title bio country gallery avg_rating reviews profile_photo wallet_address level",
+  });
 
   if (!gig) {
     return next(new AppError("No gig found", 404));
@@ -161,6 +212,8 @@ module.exports = {
   getFreelancerGigs,
   updateGigOverview,
   updateGigPricing,
+  getGigsByService,
+  getGigsBySubCategory,
   updateGigGallery,
   createGig,
 };

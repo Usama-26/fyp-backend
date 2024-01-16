@@ -85,8 +85,9 @@ const projectSchema = new mongoose.Schema(
         ref: "Proposal",
       },
     ],
-    transaction_id: {
-      type: String,
+    transactions: {
+      escrow_transaction_id: { type: String },
+      released_transaction_id: { type: String },
     },
     reviews: [
       {

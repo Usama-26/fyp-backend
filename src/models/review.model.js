@@ -83,6 +83,30 @@ reviewSchema.post("save", async function (next) {
   } catch (error) {}
 });
 
+reviewSchema.post("save", async function () {
+  try {
+    // Calculate the average rating for the user receiving the review (to)
+    const client = await ClientSchema.findById(this.to);
+    const freelancer = await FreelancerSchema.findById(this.to);
+    const toUser = client || freelancer;
+
+    if (toUser) {
+      const reviews = await Review.find({ to: this.to });
+      const totalRating = reviews.reduce(
+        (sum, review) => sum + review.rating,
+        0
+      );
+      toUser.avg_rating = totalRating / reviews.length || 0;
+      await toUser.save();
+    }
+
+    // If the review is for a gig, you may want to update the average rating for the gig as well
+    // Add similar logic for other related models if needed
+  } catch (error) {
+    console.error("Error updating avg_rating:", error);
+  }
+});
+
 reviewSchema.pre("findOneAndDelete", async function (next) {
   try {
     const toClient = await ClientSchema.updateOne(
