@@ -3,6 +3,7 @@ const Gig = require("../models/gig.model");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const cloudinaryUpload = require("../utils/cloudinaryUpload");
+const APIFeatures = require("../utils/apiFeatures");
 
 // Create a new Gig
 const createGig = catchAsync(async (req, res, next) => {
@@ -105,10 +106,12 @@ const updateGigGallery = catchAsync(async (req, res, next) => {
 
 // Get all Gigs
 const getAllGigs = catchAsync(async (req, res, next) => {
-  const gigs = await Gig.find();
-
-  if (!gigs || gigs.length === 0) {
-    return next(new AppError("No Gig Found", 404));
+  let gigs;
+  if (req.query) {
+    const features = new APIFeatures(Gig.find(), req.query).filter();
+    gigs = await features.query.populate("created_by");
+  } else {
+    gigs = await Gig.find().populate("created_by");
   }
 
   res.status(200).json({

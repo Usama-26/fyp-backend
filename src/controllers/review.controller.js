@@ -3,7 +3,7 @@ const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 
 const createReview = catchAsync(async (req, res, next) => {
-  const existing = await Review.find({
+  const existing = await Review.findOne({
     from: req.body.from,
     to: req.body.to,
     project: req.body.project,
@@ -34,7 +34,6 @@ const getAllReviews = catchAsync(async (req, res, next) => {
 
 // Get a review by its ID
 const getReviewById = catchAsync(async (req, res, next) => {
-  const reviewId = req.params.id;
   const review = await Review.findById(reviewId);
 
   res.status(200).json({
@@ -44,7 +43,7 @@ const getReviewById = catchAsync(async (req, res, next) => {
 });
 
 const updateReview = catchAsync(async (req, res, next) => {
-  const review = await Review.findByIdAndUpdate(reviewId, req.body);
+  const review = await Review.findByIdAndUpdate(req.params.id, req.body);
   res.status(200).json({
     status: "success",
     data: review,
