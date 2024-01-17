@@ -9,11 +9,6 @@ const createReview = catchAsync(async (req, res, next) => {
     project: req.body.project,
   });
 
-  if (existing) {
-    return next(
-      new AppError("You have already posted a review on this project.", 400)
-    );
-  }
   const review = await Review.create(req.body);
 
   res.status(201).json({
